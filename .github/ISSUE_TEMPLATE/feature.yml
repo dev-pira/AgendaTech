@@ -1,0 +1,42 @@
+name: "🚀 Feature"
+description: "Nova funcionalidade do Agenda Tech"
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: "## Nova Feature"
+  - type: textarea
+    id: descricao
+    attributes:
+      label: "Descrição"
+      description: "Descreva a funcionalidade a ser implementada"
+    validations:
+      required: true
+  - type: textarea
+    id: criterios
+    attributes:
+      label: "Critérios de Aceitação"
+      description: "Liste os critérios que definem quando esta task está completa"
+    validations:
+      required: true
+  - type: dropdown
+    id: comunidade
+    attributes:
+      label: "Comunidade Responsável"
+      options:
+        - DEVPIRA
+        - DevLimeira
+        - DevRioClaro
+        - DevItape
+    validations:
+      required: true
+  - type: dropdown
+    id: estimativa
+    attributes:
+      label: "Estimativa de Esforço"
+      options:
+        - "P (1-2 pontos)"
+        - "M (3-5 pontos)"
+        - "G (8 pontos)"
+    validations:
+      required: true

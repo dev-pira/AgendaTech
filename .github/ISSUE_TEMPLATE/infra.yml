@@ -1,0 +1,24 @@
+name: "⚙️ Infraestrutura / Configuração"
+description: "Tarefa de infra, CI/CD ou configuração"
+labels: ["ci-cd"]
+body:
+  - type: textarea
+    id: descricao
+    attributes:
+      label: "Descrição"
+    validations:
+      required: true
+  - type: textarea
+    id: impacto
+    attributes:
+      label: "Impacto"
+      description: "Qual o impacto desta configuração no projeto?"
+    validations:
+      required: true
+  - type: textarea
+    id: dependencias
+    attributes:
+      label: "Dependências"
+      description: "Liste tarefas ou recursos que precisam estar prontos antes"
+    validations:
+      required: true

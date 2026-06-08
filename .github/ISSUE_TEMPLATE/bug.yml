@@ -1,0 +1,28 @@
+name: "🐛 Bug Report"
+description: "Reporte um problema encontrado"
+labels: ["bug"]
+body:
+  - type: textarea
+    id: descricao
+    attributes:
+      label: "Descrição do Problema"
+    validations:
+      required: true
+  - type: textarea
+    id: passos
+    attributes:
+      label: "Passos para Reproduzir"
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: "Comportamento Esperado"
+    validations:
+      required: true
+  - type: textarea
+    id: atual
+    attributes:
+      label: "Comportamento Atual"
+    validations:
+      required: true
