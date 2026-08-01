@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Eventos — Agenda Tech{% endblock %}
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+    <h1>Eventos</h1>
+    {% if user.is_authenticated %}
+        <a href="{% url 'evento_create' %}" class="botao">+ Novo evento</a>
+    {% endif %}
+</div>
+
+<form method="get" class="filtros">
+    <div class="campo">
+        <label for="comunidade">Comunidade</label>
+        <select id="comunidade" name="comunidade">
+            <option value="">Todas</option>
+            {% for c in comunidades %}
+                <option value="{{ c.pk }}" {% if comunidade_selecionada == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.nome }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="campo">
+        <label for="cidade">Cidade</label>
+        <input type="text" id="cidade" name="cidade" value="{{ cidade }}">
+    </div>
+    <div class="campo">
+        <label for="tipo">Tipo</label>
+        <select id="tipo" name="tipo">
+            <option value="">Todos</option>
+            <option value="presencial" {% if tipo == "presencial" %}selected{% endif %}>Presencial</option>
+            <option value="online" {% if tipo == "online" %}selected{% endif %}>Online</option>
+            <option value="hibrido" {% if tipo == "hibrido" %}selected{% endif %}>Híbrido</option>
+        </select>
+    </div>
+    <div class="campo">
+        <label for="data_inicio">De</label>
+        <input type="date" id="data_inicio" name="data_inicio" value="{{ data_inicio }}">
+    </div>
+    <div class="campo">
+        <label for="data_fim">Até</label>
+        <input type="date" id="data_fim" name="data_fim" value="{{ data_fim }}">
+    </div>
+    <button type="submit" class="botao botao-secundario">Filtrar</button>
+</form>
+
+{% if page_obj.object_list %}
+<div class="grid-cards">
+    {% for evento in page_obj %}
+    <a class="card" href="{% url 'evento_detail' evento.pk %}" style="display:block;">
+        <h3>{{ evento.titulo }}</h3>
+        <div class="meta">{{ evento.data|date:"d/m/Y" }} às {{ evento.hora_inicio|time:"H:i" }} · {{ evento.local }}</div>
+        <div class="meta">{{ evento.comunidade.nome }} · organizado por {{ evento.organizador.nome_exibicao }}</div>
+        <span class="badge badge-{{ evento.tipo }}">{{ evento.get_tipo_display }}</span>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<p class="vazio">Nenhum evento encontrado.</p>
+{% endif %}
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="paginacao">
+    {% if page_obj.has_previous %}
+        <a href="?pagina={{ page_obj.previous_page_number }}">&laquo; Anterior</a>
+    {% endif %}
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+        <a href="?pagina={{ page_obj.next_page_number }}">Próxima &raquo;</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

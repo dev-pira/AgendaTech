@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Excluir {{ evento.titulo }} — Agenda Tech{% endblock %}
+{% block content %}
+<div class="breadcrumb">
+    <a href="{% url 'evento_list' %}">Eventos</a> /
+    <a href="{% url 'evento_detail' evento.pk %}">{{ evento.titulo }}</a> / Excluir
+</div>
+
+<h1>Excluir evento</h1>
+<p>Tem certeza de que deseja excluir o evento <strong>{{ evento.titulo }}</strong>? Essa ação não pode ser desfeita.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="acoes">
+        <button type="submit" class="botao botao-perigo">Confirmar exclusão</button>
+        <a href="{% url 'evento_detail' evento.pk %}" class="botao botao-secundario">Cancelar</a>
+    </div>
+</form>
+{% endblock %}

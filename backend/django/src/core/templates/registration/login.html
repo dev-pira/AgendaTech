@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Entrar — Agenda Tech{% endblock %}
+{% block content %}
+<h1>Entrar</h1>
+<form method="post" class="form-vertical" style="max-width: 360px;">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+        <div class="erro">{{ form.non_field_errors }}</div>
+    {% endif %}
+    <div class="campo">
+        <label for="{{ form.username.id_for_label }}">Usuário</label>
+        {{ form.username }}
+        {% if form.username.errors %}<div class="erro">{{ form.username.errors }}</div>{% endif %}
+    </div>
+    <div class="campo">
+        <label for="{{ form.password.id_for_label }}">Senha</label>
+        {{ form.password }}
+        {% if form.password.errors %}<div class="erro">{{ form.password.errors }}</div>{% endif %}
+    </div>
+    <button type="submit" class="botao">Entrar</button>
+</form>
+<p style="margin-top:1rem;">Ainda não tem conta? <a href="{% url 'cadastro' %}">Cadastre-se</a></p>
+{% endblock %}
