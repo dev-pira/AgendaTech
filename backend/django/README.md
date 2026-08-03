@@ -7,6 +7,8 @@ Versão "plena" do backend do Agenda Tech: um sistema Django completo que funcio
 
 Banco de dados: **SQLite** por padrão. As credenciais de conexão são lidas via `python-decouple` a partir de um arquivo `.env`, então trocar para **PostgreSQL** no futuro é só editar esse arquivo — sem mudar código.
 
+> Também existe uma versão deste backend em **Laravel/PHP**, com os mesmos endpoints — veja [`backend/laravel/README.md`](../laravel/README.md).
+
 ---
 
 ## Sumário
