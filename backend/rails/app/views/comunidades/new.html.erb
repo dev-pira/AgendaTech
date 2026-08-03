@@ -1,0 +1,5 @@
+<% content_for :title, "Nova comunidade" %>
+
+<h1>Nova comunidade</h1>
+
+<%= render "form", comunidade: @comunidade, url: new_comunidade_path, method: :post %>

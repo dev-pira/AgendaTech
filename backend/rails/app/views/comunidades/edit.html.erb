@@ -1,0 +1,5 @@
+<% content_for :title, "Editar comunidade" %>
+
+<h1>Editar comunidade</h1>
+
+<%= render "form", comunidade: @comunidade, url: edit_comunidade_path(@comunidade), method: :put %>

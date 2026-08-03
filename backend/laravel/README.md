@@ -1,6 +1,6 @@
 # Agenda Tech — Backend Laravel
 
-Versão Laravel do backend do Agenda Tech, com os **mesmos endpoints** da [versão Django](../django/README.md) (veja o [rotas.md](rotas.md) de cada uma para comparar lado a lado). Assim como a versão Django, este backend funciona de **duas formas ao mesmo tempo**:
+Versão Laravel do backend do Agenda Tech, com os **mesmos endpoints** da [versão Django](../django/README.md) e da [versão Rails](../rails/README.md) (veja o [rotas.md](rotas.md) de cada uma para comparar lado a lado). Assim como a versão Django, este backend funciona de **duas formas ao mesmo tempo**:
 
 - **Sem API** — páginas HTML server-rendered (login, cadastro, listagem e formulários de comunidades/eventos), prontas para uso no navegador.
 - **Com API** — endpoints REST em `/api/`, para um frontend separado (ex.: React) consumir.

@@ -1,0 +1,5 @@
+<% content_for :title, "Novo evento" %>
+
+<h1>Novo evento</h1>
+
+<%= render "form", evento: @evento, url: new_evento_path, method: :post, comunidades: @comunidades_usuario %>

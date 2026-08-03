@@ -1,0 +1,36 @@
+<% content_for :title, @comunidade.nome %>
+
+<h1><%= @comunidade.nome %></h1>
+<p><strong>Cidade:</strong> <%= @comunidade.cidade %></p>
+<p><strong>Contato:</strong> <%= @comunidade.contato %></p>
+<p><%= @comunidade.descricao %></p>
+
+<% if @pode_gerenciar %>
+  <p>
+    <%= link_to "Editar", edit_comunidade_path(@comunidade), class: "btn" %>
+    <%= link_to "Excluir", confirm_delete_comunidade_path(@comunidade), class: "btn btn-danger" %>
+  </p>
+<% end %>
+
+<h2>Membros</h2>
+<ul>
+  <% @membros.each do |membro| %>
+    <li><%= membro.usuario.nome_exibicao %> — <%= membro.papel %></li>
+  <% end %>
+</ul>
+
+<h2>Próximos eventos</h2>
+<% if @proximos_eventos.any? %>
+  <% @proximos_eventos.each do |evento| %>
+    <div class="card">
+      <%= link_to evento.titulo, evento_path(evento) %>
+      — <%= evento.data.strftime("%d/%m/%Y") %> às <%= evento.hora_inicio.strftime("%H:%M") %>
+    </div>
+  <% end %>
+<% else %>
+  <p>Nenhum evento futuro agendado.</p>
+<% end %>
+
+<% if logged_in? %>
+  <p><%= link_to "+ Novo evento", new_evento_path, class: "btn" %></p>
+<% end %>
