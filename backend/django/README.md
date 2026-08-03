@@ -16,6 +16,7 @@ Banco de dados: **SQLite** por padrão. As credenciais de conexão são lidas vi
 - [Como rodar — Linux / macOS](#como-rodar--linux--macos)
 - [Como rodar — Windows](#como-rodar--windows)
 - [Acessando o sistema](#acessando-o-sistema)
+- [Rotas do projeto](#rotas-do-projeto)
 - [Rodando os testes](#rodando-os-testes)
 - [Trocando para PostgreSQL](#trocando-para-postgresql)
 - [Problemas comuns](#problemas-comuns)
@@ -160,6 +161,12 @@ Fluxo básico para testar tudo manualmente:
 2. Clique em **"+ Nova comunidade"**, preencha o formulário — você vira organizador dela automaticamente.
 3. Clique em **"+ Novo evento"** dentro da comunidade criada.
 4. Acesse `/comunidades/` e `/eventos/` para ver as listagens públicas (com busca e filtros).
+
+---
+
+## Rotas do projeto
+
+Para conhecer todas as rotas disponíveis (páginas HTML, Django admin e endpoints da API REST), com uma breve descrição de cada uma, veja [rotas.md](rotas.md). É um bom ponto de partida para quem está chegando agora no projeto.
 
 ---
 
