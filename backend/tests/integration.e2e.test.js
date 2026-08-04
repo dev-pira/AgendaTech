@@ -27,6 +27,11 @@ const request = require('supertest');
 const app = require('../src/app');
 const prisma = require('../src/config/prisma');
 
+function amanha() {
+  const data = new Date(Date.now() + 86400000);
+  return data.toISOString().slice(0, 10);
+}
+
 describeIfDb('Fluxo ponta-a-ponta (auth -> comunidade -> evento -> calendário)', () => {
   jest.setTimeout(30000);
 
@@ -38,11 +43,6 @@ describeIfDb('Fluxo ponta-a-ponta (auth -> comunidade -> evento -> calendário)'
   let usuarioId;
   let comunidadeId;
   let eventoId;
-
-  function amanha() {
-    const data = new Date(Date.now() + 86400000);
-    return data.toISOString().slice(0, 10);
-  }
 
   afterAll(async () => {
     // Limpeza: evento e membros são apagados em cascata junto com a comunidade.
@@ -130,5 +130,104 @@ describeIfDb('Fluxo ponta-a-ponta (auth -> comunidade -> evento -> calendário)'
 
     expect(res.status).toBe(200);
     expect(res.body.eventos.some((e) => e.id === eventoId)).toBe(true);
+  });
+});
+
+/**
+ * Regressão: auditoria exploratória encontrou que duas criações concorrentes com o
+ * mesmo nome/título tinham ~90-100% de chance de vazar um 500 cru (com caminho de
+ * arquivo do servidor no corpo) em vez de 409, porque a checagem de duplicidade
+ * (findFirst) e o create() não são atômicos. Corrigido mapeando erros conhecidos do
+ * Prisma (P2002/P2025/P2003) em error.middleware.js. Este teste dispara a corrida de
+ * propósito — sem o fix, ele falha de forma consistente.
+ */
+describeIfDb('Regressão: corrida de concorrência não deve vazar 500', () => {
+  jest.setTimeout(30000);
+
+  const runId = Date.now();
+  const email = `race.${runId}@exemplo.com`;
+
+  let token;
+  let usuarioId;
+  let comunidadeId;
+  const comunidadeIdsCriadasNaCorrida = [];
+
+  afterAll(async () => {
+    for (const id of comunidadeIdsCriadasNaCorrida) {
+      await prisma.comunidade.delete({ where: { id } }).catch(() => {});
+    }
+    if (comunidadeId) {
+      await prisma.comunidade.delete({ where: { id: comunidadeId } }).catch(() => {});
+    }
+    if (usuarioId) {
+      await prisma.usuario.delete({ where: { id: usuarioId } }).catch(() => {});
+    }
+    await prisma.$disconnect();
+  });
+
+  beforeAll(async () => {
+    const reg = await request(app)
+      .post('/api/auth/registro')
+      .send({ nome: 'Race Tester', email, senha: 'senha123' });
+    token = reg.body.token;
+    usuarioId = reg.body.usuario.id;
+
+    const com = await request(app)
+      .post('/api/comunidades')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        nome: `Base Regressao ${runId}`,
+        descricao: 'Comunidade base para o teste de regressao de concorrencia',
+        cidade: 'Limeira',
+        contato: 'a@a.com',
+      });
+    comunidadeId = com.body.id;
+  });
+
+  it('duas criações simultâneas de comunidade com o mesmo nome nunca retornam 500', async () => {
+    const nome = `Race Regressao ${runId}`;
+    const [a, b] = await Promise.all([
+      request(app)
+        .post('/api/comunidades')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ nome, descricao: 'Descricao valida com bastante conteudo aqui', cidade: 'Limeira', contato: 'a@a.com' }),
+      request(app)
+        .post('/api/comunidades')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ nome, descricao: 'Descricao valida com bastante conteudo aqui', cidade: 'Limeira', contato: 'a@a.com' }),
+    ]);
+
+    [a, b].forEach((r) => {
+      if (r.status === 201) comunidadeIdsCriadasNaCorrida.push(r.body.id);
+    });
+
+    expect([a.status, b.status].sort()).toEqual([201, 409]);
+    const perdedor = a.status === 409 ? a : b;
+    expect(perdedor.body.erro.mensagem).not.toMatch(/\.js:\d+/); // nao deve vazar caminho+linha de arquivo
+  });
+
+  it('duas criações simultâneas de evento com o mesmo título/data nunca retornam 500', async () => {
+    const titulo = `Evento Race Regressao ${runId}`;
+    const payload = {
+      titulo,
+      descricao: 'Descricao valida com bastante conteudo aqui tambem',
+      data: amanha(),
+      hora_inicio: '08:00',
+      local: 'Local Valido',
+      tipo: 'presencial',
+      comunidade_id: comunidadeId,
+    };
+
+    const [a, b] = await Promise.all([
+      request(app).post('/api/eventos').set('Authorization', `Bearer ${token}`).send(payload),
+      request(app).post('/api/eventos').set('Authorization', `Bearer ${token}`).send(payload),
+    ]);
+
+    const vencedor = a.status === 201 ? a : b;
+    if (vencedor.status === 201) {
+      await prisma.evento.delete({ where: { id: vencedor.body.id } }).catch(() => {});
+    }
+
+    expect([a.status, b.status].sort()).toEqual([201, 409]);
   });
 });
