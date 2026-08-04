@@ -77,10 +77,16 @@ npm run dev
 npm test
 ```
 
-Os testes de `tests/validators.test.js` cobrem as regras de negócio (RN-COM-*, RN-EVT-*)
-sem precisar de banco de dados — servem de base para o pipeline de CI da DevRioClaro.
-Testes de integração ponta-a-ponta (com banco) ficam como próximo passo, uma vez que
-haja um Postgres de CI disponível.
+Há duas suítes:
+
+- `tests/health.test.js` e `tests/validators.test.js` — não precisam de banco (cobrem as
+  regras de negócio RN-COM-*/RN-EVT-* na camada de validação). Servem de base para o
+  pipeline de CI da DevRioClaro, que ainda não provisionou um Postgres de CI.
+- `tests/integration.e2e.test.js` — ponta a ponta contra um banco real (registro → login
+  → criar comunidade → criar evento → aparece no calendário → bloqueio sem auth). Só
+  roda se `DATABASE_URL` estiver definida (senão é pulada automaticamente, então `npm
+  test` continua seguro em qualquer ambiente); localmente, com o `.env` configurado,
+  rode isolada com `npm run test:e2e`. Cria e depois apaga seus próprios dados de teste.
 
 ## Estrutura de pastas
 
