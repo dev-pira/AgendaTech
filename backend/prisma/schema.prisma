@@ -1,0 +1,108 @@
+// Schema Prisma — Agenda Tech Backend (DevLimeira)
+// Modelado a partir de docs/escopo-funcional.md
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Usuario — entidade de referência. Ganhou senha_hash porque o escopo
+// funcional define papéis (organizador/membro/visitante) e códigos 401/403,
+// mas não detalhava login — decisão registrada em backend/README.md.
+// ---------------------------------------------------------------------------
+model Usuario {
+  id        String   @id @default(uuid()) @db.Uuid
+  nome      String   @db.VarChar(100)
+  email     String   @unique @db.VarChar(255)
+  senhaHash String   @map("senha_hash")
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  comunidadesCriadas  Comunidade[]       @relation("ComunidadeCriador")
+  eventosOrganizados  Evento[]           @relation("EventoOrganizador")
+  membresias          ComunidadeMembro[] @relation("MembroUsuario")
+  membrosAdicionados  ComunidadeMembro[] @relation("MembroAdicionadoPor")
+
+  @@map("usuarios")
+}
+
+model Comunidade {
+  id           String   @id @default(uuid()) @db.Uuid
+  nome         String   @db.VarChar(100)
+  descricao    String
+  cidade       String   @db.VarChar(100)
+  contato      String   @db.VarChar(255)
+  logoUrl      String?  @map("logo_url") @db.VarChar(500)
+  criadoEm     DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+  criadoPor    String   @map("criado_por") @db.Uuid
+
+  criador Usuario            @relation("ComunidadeCriador", fields: [criadoPor], references: [id])
+  eventos Evento[]
+  membros ComunidadeMembro[]
+
+  // Unicidade case-sensitive garantida pelo banco; a regra de negócio
+  // RN-COM-02 (case-insensitive) é reforçada na camada de serviço
+  // (findFirst com mode: 'insensitive') antes de criar/atualizar.
+  @@unique([nome], map: "comunidades_nome_key")
+  @@index([cidade])
+  @@map("comunidades")
+}
+
+enum TipoEvento {
+  presencial
+  online
+  hibrido
+}
+
+model Evento {
+  id            String     @id @default(uuid()) @db.Uuid
+  titulo        String     @db.VarChar(200)
+  descricao     String
+  data          DateTime   @db.Date
+  // hora_inicio/hora_fim guardados como "HH:mm" (VarChar) em vez de TIME:
+  // evita ambiguidade de timezone no Prisma para um campo puramente de
+  // exibição/validação — formato é garantido pelo validador Zod.
+  horaInicio    String     @map("hora_inicio") @db.VarChar(5)
+  horaFim       String?    @map("hora_fim") @db.VarChar(5)
+  local         String     @db.VarChar(300)
+  tipo          TipoEvento
+  urlOnline     String?    @map("url_online") @db.VarChar(500)
+  comunidadeId  String     @map("comunidade_id") @db.Uuid
+  organizadorId String     @map("organizador_id") @db.Uuid
+  criadoEm      DateTime   @default(now()) @map("criado_em")
+  atualizadoEm  DateTime   @updatedAt @map("atualizado_em")
+
+  comunidade  Comunidade @relation(fields: [comunidadeId], references: [id], onDelete: Cascade)
+  organizador Usuario    @relation("EventoOrganizador", fields: [organizadorId], references: [id])
+
+  // RN-EVT-08: sem títulos duplicados na mesma comunidade na mesma data
+  @@unique([comunidadeId, titulo, data], map: "eventos_comunidade_titulo_data_key")
+  @@index([comunidadeId])
+  @@index([data])
+  @@map("eventos")
+}
+
+enum PapelMembro {
+  organizador
+  membro
+}
+
+model ComunidadeMembro {
+  comunidadeId  String      @map("comunidade_id") @db.Uuid
+  usuarioId     String      @map("usuario_id") @db.Uuid
+  papel         PapelMembro
+  adicionadoEm  DateTime    @default(now()) @map("adicionado_em")
+  adicionadoPor String      @map("adicionado_por") @db.Uuid
+
+  comunidade           Comunidade @relation(fields: [comunidadeId], references: [id], onDelete: Cascade)
+  usuario              Usuario    @relation("MembroUsuario", fields: [usuarioId], references: [id])
+  usuarioAdicionadoPor Usuario    @relation("MembroAdicionadoPor", fields: [adicionadoPor], references: [id])
+
+  @@id([comunidadeId, usuarioId])
+  @@map("comunidade_membros")
+}
