@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Excluir {{ comunidade.nome }} — Agenda Tech{% endblock %}
+{% block content %}
+<div class="breadcrumb">
+    <a href="{% url 'comunidade_list' %}">Comunidades</a> /
+    <a href="{% url 'comunidade_detail' comunidade.pk %}">{{ comunidade.nome }}</a> / Excluir
+</div>
+
+<h1>Excluir comunidade</h1>
+<p>Tem certeza de que deseja excluir a comunidade <strong>{{ comunidade.nome }}</strong>? Essa ação não pode ser desfeita.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="acoes">
+        <button type="submit" class="botao botao-perigo">Confirmar exclusão</button>
+        <a href="{% url 'comunidade_detail' comunidade.pk %}" class="botao botao-secundario">Cancelar</a>
+    </div>
+</form>
+{% endblock %}

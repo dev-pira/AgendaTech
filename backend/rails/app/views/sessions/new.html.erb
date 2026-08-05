@@ -1,0 +1,15 @@
+<% content_for :title, "Login" %>
+
+<h1>Login</h1>
+
+<%= form_with url: login_path, method: :post do |f| %>
+  <%= label_tag :username, "Usuário" %>
+  <%= text_field_tag :username, params[:username], required: true, autofocus: true %>
+
+  <%= label_tag :password, "Senha" %>
+  <%= password_field_tag :password, nil, required: true %>
+
+  <%= submit_tag "Entrar" %>
+<% end %>
+
+<p style="margin-top: 1rem;">Ainda não tem conta? <%= link_to "Cadastre-se", cadastro_path %>.</p>

@@ -1,0 +1,28 @@
+# MySQL é o banco padrão deste projeto (ver README.md — "Trocando de banco"
+# explica como usar outro adapter). Credenciais lidas de variáveis de
+# ambiente (arquivo .env, via gem dotenv-rails), mesmo padrão das versões
+# Django e Laravel deste backend.
+default: &default
+  adapter: mysql2
+  encoding: utf8mb4
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+  username: <%= ENV.fetch("DB_USERNAME", "root") %>
+  password: <%= ENV.fetch("DB_PASSWORD", "") %>
+  host: <%= ENV.fetch("DB_HOST", "127.0.0.1") %>
+  port: <%= ENV.fetch("DB_PORT", 3306) %>
+
+development:
+  <<: *default
+  database: <%= ENV.fetch("DB_DATABASE", "agendatech_development") %>
+
+# O banco de teste roda em uma transação por teste e é limpo a cada
+# execução — usa um nome de banco separado do de desenvolvimento.
+test:
+  <<: *default
+  database: <%= ENV.fetch("DB_DATABASE_TEST", "agendatech_test") %>
+
+production:
+  <<: *default
+  database: <%= ENV.fetch("DB_DATABASE", "agendatech_production") %>
+  username: <%= ENV.fetch("DB_USERNAME") %>
+  password: <%= ENV.fetch("DB_PASSWORD") %>

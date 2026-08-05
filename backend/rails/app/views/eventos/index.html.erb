@@ -1,0 +1,54 @@
+<% content_for :title, "Eventos" %>
+
+<h1>Eventos</h1>
+
+<%= form_with url: eventos_path, method: :get do %>
+  <div style="display:flex; gap:.5rem; flex-wrap:wrap; align-items:end;">
+    <div>
+      <%= label_tag :comunidade, "Comunidade" %>
+      <%= select_tag :comunidade, options_for_select([["Todas", ""]] + @comunidades.map { |c| [c.nome, c.id] }, @comunidade_selecionada) %>
+    </div>
+    <div>
+      <%= label_tag :cidade, "Cidade" %>
+      <%= text_field_tag :cidade, @cidade %>
+    </div>
+    <div>
+      <%= label_tag :tipo, "Tipo" %>
+      <%= select_tag :tipo, options_for_select([["Todos", ""], ["Presencial", "presencial"], ["Online", "online"], ["Híbrido", "hibrido"]], @tipo) %>
+    </div>
+    <div>
+      <%= label_tag :data_inicio, "De" %>
+      <%= date_field_tag :data_inicio, @data_inicio %>
+    </div>
+    <div>
+      <%= label_tag :data_fim, "Até" %>
+      <%= date_field_tag :data_fim, @data_fim %>
+    </div>
+    <%= submit_tag "Filtrar" %>
+  </div>
+<% end %>
+
+<% if logged_in? %>
+  <p><%= link_to "+ Novo evento", new_evento_path, class: "btn" %></p>
+<% end %>
+
+<% if @eventos.any? %>
+  <% @eventos.each do |evento| %>
+    <div class="card">
+      <h2><%= link_to evento.titulo, evento_path(evento) %></h2>
+      <p><%= evento.comunidade.nome %> — <%= evento.data.strftime("%d/%m/%Y") %> às <%= evento.hora_inicio.strftime("%H:%M") %> (<%= evento.tipo %>)</p>
+    </div>
+  <% end %>
+<% else %>
+  <p>Nenhum evento encontrado.</p>
+<% end %>
+
+<div class="pagination">
+  Página <%= @paginacao[:pagina_atual] %> de <%= @paginacao[:total_paginas] %>
+  <% if @paginacao[:pagina_atual] > 1 %>
+    <%= link_to "« Anterior", eventos_path(request.query_parameters.merge(pagina: @paginacao[:pagina_atual] - 1)) %>
+  <% end %>
+  <% if @paginacao[:pagina_atual] < @paginacao[:total_paginas] %>
+    <%= link_to "Próxima »", eventos_path(request.query_parameters.merge(pagina: @paginacao[:pagina_atual] + 1)) %>
+  <% end %>
+</div>
