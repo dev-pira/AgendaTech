@@ -113,16 +113,16 @@ MS1 (DEVPIRA) ──┬──→ MS2 (DevLimeira) ──┐
 
 **Critérios de conclusão:**
 
-- [ ] Estrutura de diretórios do repositório conforme especificação
-- [ ] README.md, CONTRIBUTING.md e LICENSE presentes e completos
-- [ ] GitHub Projects board operacional com 4 colunas, labels e campos customizados
-- [ ] Automação de board funcional (issue com label → To Do)
-- [ ] 3 templates de issue + PR template validados
-- [ ] 4 milestones criados com descrições e due dates
-- [ ] Todas as 22 issues da WBS criadas com labels e milestones associados
-- [ ] Documento de stack com todas as camadas documentadas
-- [ ] Documento de escopo funcional completo (módulos, API, telas, regras)
-- [ ] Plano de tracking com roteiro da apresentação e checklist
+- [x] Estrutura de diretórios do repositório conforme especificação
+- [x] README.md, CONTRIBUTING.md e LICENSE presentes e completos
+- [x] GitHub Projects board operacional com 4 colunas, labels e campos customizados
+- [x] Automação de board funcional (issue com label → To Do)
+- [x] 3 templates de issue + PR template validados
+- [x] 4 milestones criados com descrições e due dates
+- [x] Todas as 22 issues da WBS criadas com labels e milestones associados
+- [x] Documento de stack com todas as camadas documentadas
+- [x] Documento de escopo funcional completo (módulos, API, telas, regras)
+- [x] Plano de tracking com roteiro da apresentação e checklist
 
 **Total:** 8 tarefas / 32 story points
 
@@ -270,62 +270,62 @@ MS1 (DEVPIRA) ──┬──→ MS2 (DevLimeira) ──┐
 
 - **Entregável:** Documento `docs/stack.md` completo
 - **Critério de Conclusão:**
-  - [ ] Cada camada (backend, frontend, BD, CI/CD) possui: nome da tecnologia, versão, finalidade
-  - [ ] Justificativa de escolha documentada para cada tecnologia
-  - [ ] Pré-requisitos de ambiente com versões exatas
-  - [ ] Instruções de setup local com comando de verificação
+  - [x] Cada camada (backend, frontend, BD, CI/CD) possui: nome da tecnologia, versão, finalidade
+  - [x] Justificativa de escolha documentada para cada tecnologia
+  - [x] Pré-requisitos de ambiente com versões exatas
+  - [x] Instruções de setup local com comando de verificação
 - **Dependências:** Nenhuma
 
 #### 1.2 Setup Repositório
 
 - **Entregável:** Repositório com estrutura de diretórios completa e documentação base
 - **Critério de Conclusão:**
-  - [ ] Diretórios `.github/ISSUE_TEMPLATE/`, `docs/wireframes/`, `backend/`, `frontend/`, `infra/` existem
-  - [ ] README.md com seções: propósito, stack, estrutura de pastas, link CONTRIBUTING
-  - [ ] CONTRIBUTING.md com: formatação/linting, Conventional Commits, fluxo de PR, fork workflow
-  - [ ] LICENSE MIT presente na raiz
+  - [x] Diretórios `.github/ISSUE_TEMPLATE/`, `docs/wireframes/`, `backend/`, `frontend/`, `infra/` existem
+  - [x] README.md com seções: propósito, stack, estrutura de pastas, link CONTRIBUTING
+  - [x] CONTRIBUTING.md com: formatação/linting, Conventional Commits, fluxo de PR, fork workflow
+  - [x] LICENSE MIT presente na raiz
 - **Dependências:** Nenhuma
 
 #### 1.3 Config GitHub Projects
 
 - **Entregável:** Board do GitHub Projects totalmente configurado
 - **Critério de Conclusão:**
-  - [ ] 4 colunas: To Do → In Progress → Review → Done
-  - [ ] Labels de comunidade: `devpira`, `devlimeira`, `devrioclaro`, `devitape`
-  - [ ] Labels de camada: `organizacao`, `backend`, `ci-cd`, `frontend`
-  - [ ] Campos customizados: prioridade (alta/média/baixa), estimativa (1/2/3/5/8)
-  - [ ] Automação configurada: issue com label de comunidade → To Do
+  - [x] 4 colunas: To Do → In Progress → Review → Done
+  - [x] Labels de comunidade: `devpira`, `devlimeira`, `devrioclaro`, `devitape`
+  - [x] Labels de camada: `organizacao`, `backend`, `ci-cd`, `frontend`
+  - [x] Campos customizados: prioridade (alta/média/baixa), estimativa (1/2/3/5/8)
+  - [x] Automação configurada: issue com label de comunidade → To Do
 - **Dependências:** 1.2 Setup Repositório
 
 #### 1.4 Templates de Issues
 
 - **Entregável:** Templates YAML para issues e template de PR
 - **Critério de Conclusão:**
-  - [ ] `feature.yml` com campos: descrição, critérios de aceitação, comunidade (dropdown), estimativa (dropdown)
-  - [ ] `bug.yml` com campos: descrição, passos, esperado, atual; label `bug` pré-configurada
-  - [ ] `infra.yml` com campos: descrição, impacto, dependências; label `ci-cd` pré-configurada
-  - [ ] `PULL_REQUEST_TEMPLATE.md` com seções adequadas
-  - [ ] Todos os campos com `validations.required: true`
+  - [x] `feature.yml` com campos: descrição, critérios de aceitação, comunidade (dropdown), estimativa (dropdown)
+  - [x] `bug.yml` com campos: descrição, passos, esperado, atual; label `bug` pré-configurada
+  - [x] `infra.yml` com campos: descrição, impacto, dependências; label `ci-cd` pré-configurada
+  - [x] `PULL_REQUEST_TEMPLATE.md` com seções adequadas
+  - [x] Todos os campos com `validations.required: true`
 - **Dependências:** 1.2 Setup Repositório
 
 #### 1.5 Milestones
 
 - **Entregável:** 4 milestones configurados no GitHub
 - **Critério de Conclusão:**
-  - [ ] MS1: Organização do Projeto (DEVPIRA) criado
-  - [ ] MS2: Backend API (DevLimeira) criado
-  - [ ] MS3: CI/CD e Testes (DevRioClaro) criado
-  - [ ] MS4: Frontend (DevItape) criado
-  - [ ] Cada milestone possui: descrição, due date, dependências documentadas
+  - [x] MS1: Organização do Projeto (DEVPIRA) criado
+  - [x] MS2: Backend API (DevLimeira) criado
+  - [x] MS3: CI/CD e Testes (DevRioClaro) criado
+  - [x] MS4: Frontend (DevItape) criado
+  - [x] Cada milestone possui: descrição, due date, dependências documentadas
 - **Dependências:** 1.3 Config GitHub Projects
 
 #### 1.6 Criação de Issues WBS
 
 - **Entregável:** Todas as issues da WBS criadas no repositório
 - **Critério de Conclusão:**
-  - [ ] Issue criada para cada tarefa listada neste documento
-  - [ ] Labels de comunidade e camada atribuídas em cada issue
-  - [ ] Milestone associado corretamente
+  - [x] Issue criada para cada tarefa listada neste documento
+  - [x] Labels de comunidade e camada atribuídas em cada issue
+  - [x] Milestone associado corretamente
   - [ ] Campos customizados (prioridade, estimativa) preenchidos
 - **Dependências:** 1.4 Templates de Issues, 1.5 Milestones
 
@@ -333,24 +333,24 @@ MS1 (DEVPIRA) ──┬──→ MS2 (DevLimeira) ──┐
 
 - **Entregável:** Documento `docs/tracking-plan.md`
 - **Critério de Conclusão:**
-  - [ ] Indicadores definidos: issues abertas vs fechadas, % por milestone, distribuição por comunidade
-  - [ ] Fluxo de trabalho documentado com triggers de transição
-  - [ ] Views do GitHub Projects especificadas (comunidade, prioridade, timeline)
-  - [ ] Roteiro da apresentação com duração por bloco (total 40 min)
-  - [ ] Checklist pré-apresentação completo
+  - [x] Indicadores definidos: issues abertas vs fechadas, % por milestone, distribuição por comunidade
+  - [x] Fluxo de trabalho documentado com triggers de transição
+  - [x] Views do GitHub Projects especificadas (comunidade, prioridade, timeline)
+  - [x] Roteiro da apresentação com duração por bloco (total 40 min)
+  - [x] Checklist pré-apresentação completo
 - **Dependências:** 1.3 Config GitHub Projects
 
 #### 1.8 Escopo Funcional
 
 - **Entregável:** Documento `docs/escopo-funcional.md`
 - **Critério de Conclusão:**
-  - [ ] Módulos documentados: comunidades, eventos, calendário, organizadores
-  - [ ] Modelo de dados por módulo (entidades, atributos, relacionamentos)
-  - [ ] Endpoints de API especificados (método, rota, parâmetros, resposta, status codes)
-  - [ ] Telas do frontend especificadas (componentes, dados, ações, navegação)
-  - [ ] Regras de negócio documentadas (validações, permissões, cardinalidade)
-  - [ ] Critérios de aceitação Given-When-Then (min. 1 sucesso + 1 erro por funcionalidade)
-  - [ ] Papéis de usuário (organizador, membro, visitante) e permissões por módulo
+  - [x] Módulos documentados: comunidades, eventos, calendário, organizadores
+  - [x] Modelo de dados por módulo (entidades, atributos, relacionamentos)
+  - [x] Endpoints de API especificados (método, rota, parâmetros, resposta, status codes)
+  - [x] Telas do frontend especificadas (componentes, dados, ações, navegação)
+  - [x] Regras de negócio documentadas (validações, permissões, cardinalidade)
+  - [x] Critérios de aceitação Given-When-Then (min. 1 sucesso + 1 erro por funcionalidade)
+  - [x] Papéis de usuário (organizador, membro, visitante) e permissões por módulo
 - **Dependências:** 1.1 Definição de Stack
 
 ---
