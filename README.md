@@ -61,9 +61,47 @@ AgendaTech/
 ├── backend/                  # Código do backend (DevLimeira)
 ├── frontend/                 # Código do frontend (DevItape)
 ├── infra/                    # Configurações de infraestrutura (DevRioClaro)
+├── docker-compose.yml        # Sobe banco + backend + frontend com um comando
 ├── CONTRIBUTING.md           # Guia de contribuição
 ├── LICENSE                   # Licença MIT
 └── README.md                 # Este arquivo
+```
+
+---
+
+## ▶️ Como Rodar Localmente
+
+### Opção rápida: Docker Compose
+
+Sobe banco (PostgreSQL 16), backend e frontend de uma vez, já com migrations e seed aplicados:
+
+```bash
+docker compose up --build
+```
+
+- Frontend: http://localhost:5173
+- Backend: http://localhost:3333 (`GET /health`)
+- Login de teste (criado pelo seed): `organizador@devlimeira.dev` / `senha123`
+
+### Opção manual (sem Docker)
+
+Requer Node.js ≥ 20 e PostgreSQL 16 rodando localmente (ou uma connection string gerenciada,
+ex. Neon/Supabase). Detalhes completos em [`backend/README.md`](./backend/README.md) e
+[`frontend/README.md`](./frontend/README.md).
+
+```bash
+# Backend
+cd backend
+npm install
+cp .env.example .env   # configure DATABASE_URL e JWT_SECRET
+npm run prisma:migrate -- --name init
+npm run prisma:seed
+npm run dev             # http://localhost:3333
+
+# Frontend (em outro terminal)
+cd frontend
+npm install
+npm run dev              # http://localhost:5173 — proxy automático para /api
 ```
 
 ---
