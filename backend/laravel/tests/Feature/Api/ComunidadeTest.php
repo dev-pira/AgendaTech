@@ -53,6 +53,23 @@ class ComunidadeTest extends TestCase
         $this->assertEquals(2, $response->json('dados.0.total_membros'));
     }
 
+    public function test_eventos_da_comunidade_retorna_200_com_envelope_de_paginacao(): void
+    {
+        // Regressão: PaginaResultados::paginar() era tipado com a classe
+        // concreta Builder, mas $comunidade->eventos()->with(...) devolve
+        // a relação (HasMany), não um Builder — TypeError em runtime,
+        // nunca pego porque esse endpoint não tinha teste. Ver PaginaResultados.
+        $organizador = $this->makeUser();
+        $comunidade = $this->makeComunidade($organizador);
+        $this->makeEvento($comunidade, $organizador);
+
+        $response = $this->getJson("/api/comunidades/{$comunidade->id}/eventos");
+
+        $response->assertOk();
+        $this->assertCount(1, $response->json('dados'));
+        $this->assertEquals(1, $response->json('paginacao.total_itens'));
+    }
+
     public function test_obter_retorna_200_com_dados_completos(): void
     {
         $organizador = $this->makeUser();
