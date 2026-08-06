@@ -3,6 +3,13 @@ import type { ApiErrorBody } from '@/types/api';
 const API_URL = import.meta.env.VITE_API_URL ?? '/api';
 const TOKEN_KEY = 'agendatech:token';
 
+/**
+ * Liga a camada de mock (src/mocks/) no lugar das chamadas HTTP reais — permite
+ * ver a aplicação inteira funcionando sem nenhum backend disponível. Ver
+ * frontend/README.md#modo-mock.
+ */
+export const MOCK_ENABLED = import.meta.env.VITE_USE_MOCK === 'true';
+
 export class HttpError extends Error {
   status: number;
   details?: unknown;

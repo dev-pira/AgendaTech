@@ -1,8 +1,10 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
+import { MOCK_ENABLED } from '@/services/http';
 
 const navLinks = [
   { to: '/comunidades', label: 'Comunidades' },
@@ -17,8 +19,13 @@ export function RootLayout() {
     <div className="flex min-h-svh flex-col">
       <header className="border-b">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3">
-          <Link to="/" className="text-lg font-semibold">
+          <Link to="/" className="flex items-center gap-2 text-lg font-semibold">
             🗓️ Agenda Tech
+            {MOCK_ENABLED && (
+              <Badge variant="secondary" className="font-normal">
+                dados de demonstração
+              </Badge>
+            )}
           </Link>
           <nav className="flex items-center gap-1">
             {navLinks.map((link) => (

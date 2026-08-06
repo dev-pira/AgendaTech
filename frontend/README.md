@@ -42,6 +42,27 @@ Por padrão, o frontend chama `/api` e o **Vite faz proxy** dessas chamadas para
 com CORS para rodar contra um backend local na porta padrão. Para apontar para outro backend,
 copie `.env.example` para `.env` e defina `VITE_API_URL`.
 
+### Modo mock
+
+O backend ainda não precisa estar rodando pra desenvolver ou demonstrar o frontend. Com
+`VITE_USE_MOCK=true` (copie `.env.example` para `.env` e ajuste), a aplicação inteira passa a
+rodar contra dados fake em memória (`src/mocks/`), que replicam as mesmas regras de negócio do
+backend real (RN-COM-*, RN-EVT-*, RN-ORG-*) — inclusive erros 401/403/404/409/422 nos mesmos
+cenários. O toggle fica centralizado em `MOCK_ENABLED` (`src/services/http.ts`); cada função em
+`src/services/*.ts` decide entre chamar o mock ou a API real, então **nenhuma página ou
+componente precisa saber qual modo está ativo**.
+
+```bash
+echo "VITE_USE_MOCK=true" >> .env
+npm run dev
+```
+
+Login de demonstração (mesmo e-mail do seed do backend): `organizador@devlimeira.dev` /
+`senha123`. Os dados resetam a cada reload da página — é em memória, não persiste.
+
+Quando o backend real estiver disponível, é só voltar `VITE_USE_MOCK=false` (ou remover a
+variável) e apontar `VITE_API_URL` para ele — nenhum código de página muda.
+
 ### 4. Build de produção
 
 ```bash
