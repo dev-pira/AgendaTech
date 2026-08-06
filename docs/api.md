@@ -10,6 +10,7 @@
 - [Paginação](#paginação)
 - [Formato de erro](#formato-de-erro)
 - [Comunidades](#comunidades)
+- [Membros](#membros)
 - [Eventos](#eventos)
 
 ---
@@ -264,6 +265,102 @@ curl -X DELETE http://localhost:8000/api/comunidades/9c1f0e1a-... \
 ```
 
 **Respostas:** `204` · `400` (evento futuro agendado) · `401` · `403` · `404`
+
+---
+
+## Membros
+
+Gestão de membros/organizadores de uma comunidade. **Todos os endpoints exigem autenticação** — inclusive a listagem (diferente de Comunidades/Eventos, onde `GET` é público).
+
+### `GET /api/comunidades/{id}/membros`
+
+Lista os membros de uma comunidade. Qualquer usuário autenticado pode listar (não precisa ser organizador).
+
+**Query params**
+
+| Param | Tipo | Descrição |
+|---|---|---|
+| `papel` | `organizador`\|`membro` | Filtra por papel |
+| `pagina`, `limite` | int | Ver [Paginação](#paginação) |
+
+```bash
+curl "http://localhost:8000/api/comunidades/9c1f0e1a-.../membros?papel=organizador" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+```json
+{
+  "dados": [
+    {
+      "comunidade_id": "9c1f0e1a-...",
+      "usuario_id": "3fa2...",
+      "papel": "organizador",
+      "adicionado_em": "2026-08-01T12:00:00.000000Z",
+      "adicionado_por_id": "3fa2...",
+      "usuario": { "id": "3fa2...", "nome": "Fábio Baldin", "email": "fabio@example.com" }
+    }
+  ],
+  "paginacao": { "pagina_atual": 1, "total_paginas": 1, "total_itens": 1, "limite": 20 }
+}
+```
+
+**Respostas:** `200` · `401` · `404` (comunidade inexistente)
+
+---
+
+### `POST /api/comunidades/{id}/membros`
+
+Adiciona um membro existente do sistema à comunidade. **Requer ser organizador da comunidade.**
+
+**Body**
+
+| Campo | Tipo | Obrigatório | Regras |
+|---|---|---|---|
+| `email` | string | Sim | Deve corresponder a um usuário já cadastrado (RN-ORG-04) |
+| `papel` | `organizador`\|`membro` | Sim | |
+
+```bash
+curl -X POST http://localhost:8000/api/comunidades/9c1f0e1a-.../membros \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"email":"novo@example.com","papel":"membro"}'
+```
+
+Resposta: `201` com o mesmo formato do item de [`GET /api/comunidades/{id}/membros`](#get-apicomunidadesidmembros).
+
+**Respostas:** `201` · `401` · `403` (não é organizador) · `404` (comunidade ou email sem usuário correspondente) · `409` (já é membro) · `422`
+
+---
+
+### `PATCH /api/comunidades/{id}/membros/{usuario_id}/papel`
+
+Altera o papel de um membro. **Requer ser organizador da comunidade.**
+
+**Body**
+
+| Campo | Tipo | Obrigatório |
+|---|---|---|
+| `papel` | `organizador`\|`membro` | Sim |
+
+```bash
+curl -X PATCH http://localhost:8000/api/comunidades/9c1f0e1a-.../membros/3fa2.../papel \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"papel":"membro"}'
+```
+
+**Respostas:** `200` · `401` · `403` · `404` (membro não pertence à comunidade) · `422` (RN-ORG-01 — rebaixar o último organizador)
+
+---
+
+### `DELETE /api/comunidades/{id}/membros/{usuario_id}`
+
+Remove um membro da comunidade. **Requer ser organizador da comunidade.**
+
+```bash
+curl -X DELETE http://localhost:8000/api/comunidades/9c1f0e1a-.../membros/3fa2... \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Respostas:** `204` · `401` · `403` · `404` (membro não pertence à comunidade) · `422` (RN-ORG-01 — remover o último organizador)
 
 ---
 
