@@ -77,6 +77,14 @@ class ApiErrorResponder
             return 'Ocorreu um erro interno no servidor.';
         }
 
+        // ModelNotFoundException (convertida em NotFoundHttpException pelo
+        // router) expõe o FQCN do model na mensagem padrão do Laravel
+        // ("No query results for model [App\Models\Comunidade] ...") —
+        // detalhe interno que não deve vazar pela API pública.
+        if ($status === 404) {
+            return 'Recurso não encontrado.';
+        }
+
         return $e->getMessage() !== '' ? $e->getMessage() : 'Ocorreu um erro ao processar a requisição.';
     }
 }
