@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
@@ -14,12 +16,19 @@ const navLinks = [
 
 export function RootLayout() {
   const { usuario, logout } = useAuth();
+  const [menuAberto, setMenuAberto] = useState(false);
+
+  const fecharMenu = () => setMenuAberto(false);
 
   return (
     <div className="flex min-h-svh flex-col">
       <header className="border-b">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3">
-          <Link to="/" className="flex items-center gap-2 text-lg font-semibold">
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-lg font-semibold"
+            onClick={fecharMenu}
+          >
             🗓️ Agenda Tech
             {MOCK_ENABLED && (
               <Badge variant="secondary" className="font-normal">
@@ -27,7 +36,7 @@ export function RootLayout() {
               </Badge>
             )}
           </Link>
-          <nav className="flex items-center gap-1">
+          <nav className="hidden items-center gap-1 md:flex">
             {navLinks.map((link) => (
               <NavLink
                 key={link.to}
@@ -43,7 +52,7 @@ export function RootLayout() {
               </NavLink>
             ))}
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="hidden items-center gap-2 md:flex">
             {usuario ? (
               <>
                 <span className="hidden text-sm text-muted-foreground sm:inline">
@@ -64,7 +73,70 @@ export function RootLayout() {
               </>
             )}
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="min-h-11 min-w-11 md:hidden"
+            aria-label={menuAberto ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={menuAberto}
+            aria-controls="menu-mobile"
+            onClick={() => setMenuAberto((aberto) => !aberto)}
+          >
+            {menuAberto ? <X /> : <Menu />}
+          </Button>
         </div>
+        {menuAberto && (
+          <div id="menu-mobile" className="border-t px-4 py-3 md:hidden">
+            <nav className="flex flex-col gap-1">
+              {navLinks.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  onClick={fecharMenu}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex min-h-11 items-center rounded-md px-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground',
+                      isActive && 'bg-accent text-accent-foreground',
+                    )
+                  }
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+            </nav>
+            <div className="mt-3 flex flex-col gap-2 border-t pt-3">
+              {usuario ? (
+                <>
+                  <span className="px-3 text-sm text-muted-foreground">{usuario.nome}</span>
+                  <Button
+                    variant="outline"
+                    className="min-h-11 w-full justify-center"
+                    onClick={() => {
+                      logout();
+                      fecharMenu();
+                    }}
+                  >
+                    Sair
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="ghost"
+                    className="min-h-11 w-full justify-center"
+                    asChild
+                    onClick={fecharMenu}
+                  >
+                    <Link to="/login">Entrar</Link>
+                  </Button>
+                  <Button className="min-h-11 w-full justify-center" asChild onClick={fecharMenu}>
+                    <Link to="/registro">Criar conta</Link>
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </header>
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
         <Outlet />

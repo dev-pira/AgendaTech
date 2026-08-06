@@ -27,7 +27,7 @@ atômico (`docs/development/git-workflow.md`), tipicamente `chore(deploy): ...` 
     - _Requirements: 1.4_
 
 - [ ] 4. Versionar `frontend/vercel.json`
-  - [ ] 4.1 Criar o arquivo conforme design.md (Componente 1), incluindo o rewrite para SPA
+  - [x] 4.1 Criar o arquivo conforme design.md (Componente 1), incluindo o rewrite para SPA
     - _Requirements: 3.2_
   - [ ] 4.2 Validar localmente com `vercel build` antes do primeiro deploy real
     - _Requirements: 3.1, 3.3_
