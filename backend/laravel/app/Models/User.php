@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -17,12 +15,14 @@ use Illuminate\Notifications\Notifiable;
  * Usuário da plataforma. Papéis (organizador/membro) são por comunidade,
  * ver ComunidadeMembro — não existe flag global de papel no usuário.
  */
-#[Fillable(['username', 'email', 'first_name', 'last_name', 'password'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasUuids, Notifiable;
+
+    protected $fillable = ['username', 'email', 'first_name', 'last_name', 'password'];
+
+    protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
     {

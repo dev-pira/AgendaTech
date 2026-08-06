@@ -2,9 +2,10 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Comunidade;
 use Illuminate\Http\Request;
 
-/** @mixin \App\Models\Comunidade */
+/** @mixin Comunidade */
 class ComunidadeDetailResource extends ComunidadeResource
 {
     public function toArray(Request $request): array
