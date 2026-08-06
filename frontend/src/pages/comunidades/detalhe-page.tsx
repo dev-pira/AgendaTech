@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
+import { ShareButton } from '@/components/share-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -79,16 +80,19 @@ export function DetalheComunidadePage() {
           <h1 className="text-2xl font-semibold">{comunidade.nome}</h1>
           <p className="text-muted-foreground">{comunidade.cidade}</p>
         </div>
-        {ehCriador && (
-          <div className="flex gap-2">
-            <Button variant="outline" asChild>
-              <Link to={`/comunidades/${comunidade.id}/editar`}>Editar</Link>
-            </Button>
-            <Button variant="destructive" disabled={excluindo} onClick={handleExcluir}>
-              {excluindo ? 'Excluindo...' : 'Excluir'}
-            </Button>
-          </div>
-        )}
+        <div className="flex gap-2">
+          <ShareButton title={comunidade.nome} text={`${comunidade.nome} — Agenda Tech`} />
+          {ehCriador && (
+            <>
+              <Button variant="outline" asChild>
+                <Link to={`/comunidades/${comunidade.id}/editar`}>Editar</Link>
+              </Button>
+              <Button variant="destructive" disabled={excluindo} onClick={handleExcluir}>
+                {excluindo ? 'Excluindo...' : 'Excluir'}
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       <Card>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
+import { ShareButton } from '@/components/share-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -75,16 +76,19 @@ export function DetalheEventoPage() {
             </Link>
           )}
         </div>
-        {podeTentarGerenciar && (
-          <div className="flex gap-2">
-            <Button variant="outline" asChild>
-              <Link to={`/eventos/${evento.id}/editar`}>Editar</Link>
-            </Button>
-            <Button variant="destructive" disabled={excluindo} onClick={handleExcluir}>
-              {excluindo ? 'Excluindo...' : 'Excluir'}
-            </Button>
-          </div>
-        )}
+        <div className="flex gap-2">
+          <ShareButton title={evento.titulo} text={`${evento.titulo} — Agenda Tech`} />
+          {podeTentarGerenciar && (
+            <>
+              <Button variant="outline" asChild>
+                <Link to={`/eventos/${evento.id}/editar`}>Editar</Link>
+              </Button>
+              <Button variant="destructive" disabled={excluindo} onClick={handleExcluir}>
+                {excluindo ? 'Excluindo...' : 'Excluir'}
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       <Card>
