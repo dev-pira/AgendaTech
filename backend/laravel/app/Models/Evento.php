@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,13 +12,14 @@ use Illuminate\Validation\ValidationException;
  * Regras de negócio replicadas de core/models.py (Django) — ver Comunidade
  * para o mesmo padrão (validação centralizada no model via evento saving).
  */
-#[Fillable([
-    'titulo', 'descricao', 'data', 'hora_inicio', 'hora_fim', 'local',
-    'tipo', 'url_online', 'comunidade_id', 'organizador_id',
-])]
 class Evento extends Model
 {
     use HasFactory, HasUuids;
+
+    protected $fillable = [
+        'titulo', 'descricao', 'data', 'hora_inicio', 'hora_fim', 'local',
+        'tipo', 'url_online', 'comunidade_id', 'organizador_id',
+    ];
 
     public const PRESENCIAL = 'presencial';
 

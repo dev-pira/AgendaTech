@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // RN-COM-02: nome único, sem diferenciar maiúsculas/minúsculas.
+        // RN-COM-06: nome único, sem diferenciar maiúsculas/minúsculas.
         if (Schema::getConnection()->getDriverName() === 'sqlite') {
             DB::statement('CREATE UNIQUE INDEX comunidades_nome_ci_unique ON comunidades (nome COLLATE NOCASE)');
         } else {

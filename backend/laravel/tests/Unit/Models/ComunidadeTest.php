@@ -3,6 +3,7 @@
 namespace Tests\Unit\Models;
 
 use App\Models\Comunidade;
+use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 use Tests\Concerns\CriaDados;
 use Tests\TestCase;
@@ -74,7 +75,7 @@ class ComunidadeTest extends TestCase
         $organizador = $this->makeUser();
         $this->makeComunidade($organizador, ['nome' => 'DEVPIRA']);
 
-        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectException(QueryException::class);
         $this->makeComunidade($organizador, ['nome' => 'devpira']);
     }
 

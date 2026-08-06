@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
-#[Fillable(['comunidade_id', 'usuario_id', 'papel', 'adicionado_por_id'])]
 class ComunidadeMembro extends Pivot
 {
     public const ORGANIZADOR = 'organizador';
 
     public const MEMBRO = 'membro';
+
+    protected $fillable = ['comunidade_id', 'usuario_id', 'papel', 'adicionado_por_id'];
 
     public $incrementing = true;
 

@@ -2,9 +2,10 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Evento;
 use Illuminate\Http\Request;
 
-/** @mixin \App\Models\Evento */
+/** @mixin Evento */
 class EventoDetailResource extends EventoResource
 {
     public function toArray(Request $request): array

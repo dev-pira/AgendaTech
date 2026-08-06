@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,12 +16,13 @@ use Illuminate\Validation\ValidationException;
  * aqui, no model, para ser compartilhada pelas duas superfícies (web e API)
  * — ver docstring de app/Http/Controllers/Api/*Controller.php.
  */
-#[Fillable(['nome', 'descricao', 'cidade', 'contato', 'logo_url', 'criado_por_id'])]
 class Comunidade extends Model
 {
     use HasFactory, HasUuids;
 
     public const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'svg', 'webp'];
+
+    protected $fillable = ['nome', 'descricao', 'cidade', 'contato', 'logo_url', 'criado_por_id'];
 
     protected $attributes = [
         'logo_url' => '',
