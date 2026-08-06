@@ -35,9 +35,11 @@ O **Agenda Tech** é uma aplicação web de calendário colaborativo onde comuni
 
 | Camada | Tecnologia | Finalidade |
 |--------|-----------|------------|
-| **Backend** | Node.js + Express | API REST para gerenciamento de comunidades e eventos |
-| **Frontend** | React | Interface de usuário do calendário colaborativo |
-| **Banco de Dados** | PostgreSQL | Armazenamento de dados de comunidades, eventos e organizadores |
+| **Backend** | PHP 8.2 + Laravel 11.x | API REST para gerenciamento de comunidades e eventos |
+| **Banco de Dados** | PostgreSQL 9.5 | Armazenamento de dados de comunidades, eventos e organizadores |
+| **Frontend** | React 18 + Vite 5.x | Interface de usuário do calendário colaborativo |
+| **Lint/Format** | Laravel Pint 1.x | Formatação automática de código PHP |
+| **Análise Estática** | PHPStan 1.x | Detecção de erros de tipo e inconsistências em PHP |
 | **CI/CD** | GitHub Actions | Pipelines de integração contínua, testes e deploy automatizado |
 
 > Para detalhes completos sobre a stack (versões, justificativas e setup de ambiente), consulte [`docs/stack.md`](./docs/stack.md).
