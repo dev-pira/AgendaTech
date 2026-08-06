@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, Moon, Sun, X } from 'lucide-react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
+import { useTheme } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
 import { MOCK_ENABLED } from '@/services/http';
 
@@ -16,9 +17,12 @@ const navLinks = [
 
 export function RootLayout() {
   const { usuario, logout } = useAuth();
+  const { resolvedTheme, setTheme } = useTheme();
   const [menuAberto, setMenuAberto] = useState(false);
 
   const fecharMenu = () => setMenuAberto(false);
+  const alternarTema = () => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+  const rotuloAlternarTema = resolvedTheme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro';
 
   return (
     <div className="flex min-h-svh flex-col">
@@ -53,6 +57,15 @@ export function RootLayout() {
             ))}
           </nav>
           <div className="hidden items-center gap-2 md:flex">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="min-h-11 min-w-11"
+              aria-label={rotuloAlternarTema}
+              onClick={alternarTema}
+            >
+              {resolvedTheme === 'dark' ? <Sun /> : <Moon />}
+            </Button>
             {usuario ? (
               <>
                 <span className="hidden text-sm text-muted-foreground sm:inline">
@@ -105,6 +118,15 @@ export function RootLayout() {
               ))}
             </nav>
             <div className="mt-3 flex flex-col gap-2 border-t pt-3">
+              <Button
+                variant="ghost"
+                className="min-h-11 w-full justify-center gap-2"
+                aria-label={rotuloAlternarTema}
+                onClick={alternarTema}
+              >
+                {resolvedTheme === 'dark' ? <Sun /> : <Moon />}
+                {rotuloAlternarTema}
+              </Button>
               {usuario ? (
                 <>
                   <span className="px-3 text-sm text-muted-foreground">{usuario.nome}</span>

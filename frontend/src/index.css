@@ -81,3 +81,42 @@
     @apply bg-background text-foreground;
   }
 }
+
+/*
+ * FullCalendar não segue os tokens Tailwind do projeto (usa suas próprias
+ * variáveis CSS com cores fixas). Em dark mode isso deixava o calendário
+ * como uma "ilha branca" no meio de uma página escura — os overrides abaixo
+ * remapeiam as variáveis do FullCalendar para os tokens do design system.
+ */
+.dark .fc {
+  --fc-border-color: var(--border);
+  --fc-page-bg-color: var(--card);
+  --fc-neutral-bg-color: var(--muted);
+  --fc-neutral-text-color: var(--muted-foreground);
+  --fc-list-event-hover-bg-color: var(--accent);
+  --fc-today-bg-color: color-mix(in oklch, var(--primary) 18%, transparent);
+  --fc-button-text-color: var(--foreground);
+  --fc-button-bg-color: var(--secondary);
+  --fc-button-border-color: var(--border);
+  --fc-button-hover-bg-color: var(--accent);
+  --fc-button-hover-border-color: var(--border);
+  --fc-button-active-bg-color: var(--accent);
+  --fc-button-active-border-color: var(--border);
+  color: var(--foreground);
+}
+
+.dark .fc .fc-daygrid-day-frame,
+.dark .fc .fc-scrollgrid {
+  background-color: var(--card);
+}
+
+.dark .fc .fc-col-header-cell-cushion,
+.dark .fc .fc-daygrid-day-number,
+.dark .fc .fc-toolbar-title {
+  color: var(--foreground);
+}
+
+.dark .fc-theme-standard td,
+.dark .fc-theme-standard th {
+  border-color: var(--border);
+}
