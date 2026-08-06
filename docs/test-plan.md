@@ -16,9 +16,13 @@
 
 | Regra | Cenário | Camada | Teste |
 |---|---|---|---|
-| Login válido retorna token | credenciais corretas → 200 + token | API | `Feature/Api/AuthTokenTest::test_credenciais_validas_retorna_200_com_token` |
-| Token é reaproveitado | duas chamadas com mesmas credenciais → mesmo token persistido | API | `Feature/Api/AuthTokenTest::test_token_retornado_e_persistido` |
+| Login válido retorna token | credenciais corretas → 200 + JWT | API | `Feature/Api/AuthTokenTest::test_credenciais_validas_retorna_200_com_token` |
+| Token emitido é válido | token retornado autentica de verdade numa rota protegida (ciclo completo emissão → verificação) | API | `Feature/Api/AuthTokenTest::test_token_retornado_e_valido_para_o_usuario_correto` |
 | Credenciais inválidas | senha errada → 401 | API | `Feature/Api/AuthTokenTest::test_senha_invalida_retorna_401` |
+| Token expirado | JWT com `exp` no passado → 401 | API | `Feature/Api/AuthTokenTest::test_token_expirado_retorna_401` |
+| Token com assinatura inválida | JWT assinado com outra chave → 401 | API | `Feature/Api/AuthTokenTest::test_token_com_assinatura_invalida_retorna_401` |
+| Token malformado | string qualquer como Bearer → 401 (nunca 500) | API | `Feature/Api/AuthTokenTest::test_token_malformado_retorna_401` |
+| Token de usuário removido | JWT válido, mas usuário foi deletado depois de emitido → 401 | API | `Feature/Api/AuthTokenTest::test_token_de_usuario_que_nao_existe_mais_retorna_401` |
 | Cadastro (form) | GET retorna 200 | Web | `Feature/Web/AuthTest::test_cadastro_get_retorna_200` |
 | Cadastro válido | POST válido cria usuário e loga | Web | `Feature/Web/AuthTest::test_cadastro_post_valido_cria_usuario_e_loga` |
 | Cadastro — senhas diferentes | confirmação não bate → não cria usuário | Web | `Feature/Web/AuthTest::test_cadastro_senhas_diferentes_nao_cria_usuario` |
@@ -28,7 +32,7 @@
 | Login inválido | credenciais erradas não autenticam | Web | `Feature/Web/AuthTest::test_login_credenciais_invalidas_nao_autentica` |
 | Logout | desautentica a sessão | Web | `Feature/Web/AuthTest::test_logout_desautentica_usuario` |
 
-**Cobertura:** 11 testes. **Gap conhecido:** nenhum teste de expiração/revogação de token (o model `Token` não implementa TTL — se isso mudar, adicionar cenário aqui).
+**Cobertura:** 15 testes. Gap de expiração/assinatura/token-de-usuário-removido fechado (issue #52 — migração de Bearer token opaco pra JWT). Revogação continua não coberta porque JWT stateless não suporta revogação nativa (é o trade-off do design); se isso virar requisito, provavelmente entra uma denylist e um teste novo aqui.
 
 ---
 
@@ -75,8 +79,11 @@
 | `DELETE` — RN-COM-07 | organizador exclui com sucesso | `Feature/Api/ComunidadeTest::test_excluir_organizador_exclui_com_sucesso` |
 | `DELETE` — RN-COM-09 | evento futuro agendado → 400, não exclui | `Feature/Api/ComunidadeTest::test_excluir_com_evento_futuro_retorna_400` |
 | `DELETE` — RN-COM-07 | não-organizador → 403 | `Feature/Api/ComunidadeTest::test_excluir_nao_organizador_recebe_403` |
+| `GET /{id}/eventos`, envelope de paginação | 200 | `Feature/Api/ComunidadeTest::test_eventos_da_comunidade_retorna_200_com_envelope_de_paginacao` |
 
-**Cobertura:** 18 testes. Todos os 5 verbos HTTP (`GET` lista, `GET` item, `POST`, `PUT`, `DELETE`) e todas as regras RN-COM-01, 06, 07, 08, 09 cobertas.
+**Cobertura:** 19 testes. Todos os 5 verbos HTTP (`GET` lista, `GET` item, `POST`, `PUT`, `DELETE`) e todas as regras RN-COM-01, 06, 07, 08, 09 cobertas.
+
+O teste de `GET /{id}/eventos` é regressão: `PaginaResultados::paginar()` era tipado com a classe concreta `Builder`, mas relações Eloquent (`$comunidade->eventos()->with(...)`) devolvem a própria relação (`HasMany`), não um `Builder` — `TypeError` em runtime. Esse endpoint nunca teve teste até a issue #53 mexer em código vizinho e pegar o bug de rodada.
 
 ---
 
@@ -160,14 +167,62 @@ Cobertura específica do contrato `{"error": {"code", "message", "fields"?}}` (`
 
 ---
 
+## 9. Membros (`/api/comunidades/{id}/membros`)
+
+Gestão de membros/organizadores — issue #53, porte de `backend/src/services/membros.service.js` (Node) que nunca tinha sido migrado pro Laravel. **Todos os 4 endpoints exigem autenticação, inclusive o `GET`** (diferente de Comunidades/Eventos).
+
+| Endpoint / cenário | Status esperado | Teste |
+|---|---|---|
+| `GET` lista membros da comunidade | 200 | `Feature/Api/MembroTest::test_listar_retorna_200_com_membros_da_comunidade` |
+| `GET` filtra por `?papel=` | 200, filtrado | `Feature/Api/MembroTest::test_listar_filtra_por_papel` |
+| `GET` sem autenticação | 401 | `Feature/Api/MembroTest::test_listar_sem_autenticacao_retorna_401` |
+| `GET` comunidade inexistente | 404 | `Feature/Api/MembroTest::test_listar_comunidade_inexistente_retorna_404` |
+| `POST` organizador adiciona com sucesso | 201 | `Feature/Api/MembroTest::test_adicionar_organizador_adiciona_com_sucesso` |
+| `POST` sem ser organizador | 403 | `Feature/Api/MembroTest::test_adicionar_sem_ser_organizador_recebe_403` |
+| `POST` — RN-ORG-04 | email sem usuário correspondente → 404 | `Feature/Api/MembroTest::test_adicionar_email_sem_usuario_correspondente_retorna_404` |
+| `POST` usuário já é membro | 409 | `Feature/Api/MembroTest::test_adicionar_usuario_ja_membro_retorna_409` |
+| `POST` sem autenticação | 401 | `Feature/Api/MembroTest::test_adicionar_sem_autenticacao_retorna_401` |
+| `PATCH` papel — organizador promove com sucesso | 200 | `Feature/Api/MembroTest::test_atualizar_papel_organizador_promove_membro_com_sucesso` |
+| `PATCH` papel sem ser organizador | 403 | `Feature/Api/MembroTest::test_atualizar_papel_sem_ser_organizador_recebe_403` |
+| `PATCH` papel — RN-ORG-01 | rebaixar último organizador → 422 | `Feature/Api/MembroTest::test_atualizar_papel_rebaixar_ultimo_organizador_retorna_422` |
+| `PATCH` papel, membro não encontrado | 404 | `Feature/Api/MembroTest::test_atualizar_papel_membro_nao_encontrado_retorna_404` |
+| `DELETE` organizador remove com sucesso | 204 | `Feature/Api/MembroTest::test_remover_organizador_remove_membro_com_sucesso` |
+| `DELETE` sem ser organizador | 403 | `Feature/Api/MembroTest::test_remover_sem_ser_organizador_recebe_403` |
+| `DELETE` — RN-ORG-01 | remover último organizador → 422 | `Feature/Api/MembroTest::test_remover_ultimo_organizador_retorna_422` |
+| `DELETE`, membro não encontrado | 404 | `Feature/Api/MembroTest::test_remover_membro_nao_encontrado_retorna_404` |
+
+**Cobertura:** 17 testes. RN-ORG-01 (nunca zero organizadores) e RN-ORG-04 (email precisa existir) cobertas nos dois endpoints que se aplicam (promover/rebaixar e adicionar).
+
+---
+
+## 10. Calendário (`/api/calendario`)
+
+Endpoint agregador pra tela de calendário compartilhado (DevItape) — issue #54, porte de `backend/src/controllers/calendario.controller.js` (Node). Público, sem paginação, `data_inicio`/`data_fim` obrigatórios (diferente de `GET /eventos`, onde são opcionais).
+
+| Cenário | Status esperado | Teste |
+|---|---|---|
+| Sem `data_inicio` | 422 | `Feature/Api/CalendarioTest::test_sem_data_inicio_retorna_422` |
+| Sem `data_fim` | 422 | `Feature/Api/CalendarioTest::test_sem_data_fim_retorna_422` |
+| `data_fim` antes de `data_inicio` | 422 | `Feature/Api/CalendarioTest::test_data_fim_antes_de_data_inicio_retorna_422` |
+| Retorna 200 com envelope `eventos`/`total`/`periodo` | 200 | `Feature/Api/CalendarioTest::test_retorna_200_com_envelope_eventos_total_periodo` |
+| Não retorna eventos fora do período | 200, filtrado | `Feature/Api/CalendarioTest::test_nao_retorna_eventos_fora_do_periodo` |
+| Filtra por `comunidade_id` | 200, filtrado | `Feature/Api/CalendarioTest::test_filtra_por_comunidade_id` |
+| Filtra por `cidade` | 200, filtrado | `Feature/Api/CalendarioTest::test_filtra_por_cidade` |
+| Filtra por `tipo` | 200, filtrado | `Feature/Api/CalendarioTest::test_filtra_por_tipo` |
+| Endpoint é público | 200 sem token | `Feature/Api/CalendarioTest::test_endpoint_e_publico_sem_autenticacao` |
+
+**Cobertura:** 9 testes.
+
+---
+
 ## Resumo por camada
 
 | Camada | Testes | Arquivos |
 |---|---:|---|
 | Unit (models) | 18 | `Unit/Models/ComunidadeTest.php`, `Unit/Models/EventoTest.php` |
-| API (Feature) | 43 | `Feature/Api/AuthTokenTest.php`, `ComunidadeTest.php`, `ErrorEnvelopeTest.php`, `EventoTest.php` |
+| API (Feature) | 74 | `Feature/Api/AuthTokenTest.php`, `ComunidadeTest.php`, `ErrorEnvelopeTest.php`, `EventoTest.php`, `MembroTest.php`, `CalendarioTest.php` |
 | Web (Feature) | 44 | `Feature/Web/AuthTest.php`, `ComunidadeTest.php`, `EventoTest.php` |
-| **Total** | **105** | — |
+| **Total** | **136** | — |
 
 Rodar tudo: `php artisan test` (dentro de `backend/laravel`). Rodar um arquivo: `php artisan test --filter=NomeDaClasse`.
 
@@ -176,6 +231,7 @@ Rodar tudo: `php artisan test` (dentro de `backend/laravel`). Rodar um arquivo: 
 1. RN-COM-10 (listagem não expõe dado sensível de membro) sem teste dedicado.
 2. Filtros `data_inicio`/`data_fim`/`tipo` de `GET /api/eventos` sem teste (só `comunidade_id` testado).
 3. Erro `500 INTERNAL_ERROR` do envelope não tem teste automatizado.
-4. Sem teste de expiração/revogação de token de autenticação (não implementado no model ainda).
+4. ~~Sem teste de expiração/revogação de token~~ — fechado na issue #52 (migração pra JWT). Revogação continua não coberta (trade-off do design stateless, não uma lacuna de teste).
+5. Mensagens de erro de validação sem `messages()` customizado saem em inglês (`"The data inicio field is required."`), mesmo com `APP_LOCALE=pt_BR` — falta `lang/pt_BR/validation.php`. Afeta todos os `FormRequest` da API. Encontrado testando `CalendarioRequest` (issue #54), não corrigido ainda — nenhum teste falha por causa disso porque nenhum teste verifica o idioma da mensagem, só o status code.
 
 Ao fechar um desses, mova a linha correspondente da tabela de gap para a seção principal e apague daqui.

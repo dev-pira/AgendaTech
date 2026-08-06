@@ -3,15 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Token;
 use App\Models\User;
+use App\Support\JwtService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * Autenticação: Bearer token simples (ver model Token). Para obter um
- * token, use POST /api/auth/token com username/password de um usuário
- * já criado (via cadastro ou seeder). Espelha core/api.py (Django).
+ * Autenticação: JWT assinado (ver App\Support\JwtService), stateless —
+ * sem tabela de tokens. Para obter um token, use POST /api/auth/token
+ * com username/password de um usuário já criado (via cadastro ou
+ * seeder). Espelha backend/src/services/auth.service.js (Node) e
+ * core/api.py (Django). Substitui o Bearer token opaco anterior
+ * (tabela `tokens`, removida — ver issue #52).
  */
 class AuthController extends Controller
 {
@@ -28,8 +31,7 @@ class AuthController extends Controller
 
         /** @var User $user */
         $user = Auth::user();
-        $token = Token::firstOrCreate(['user_id' => $user->id]);
 
-        return response()->json(['token' => $token->key]);
+        return response()->json(['token' => JwtService::encode($user)]);
     }
 }

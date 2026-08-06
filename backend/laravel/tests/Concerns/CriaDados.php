@@ -5,8 +5,8 @@ namespace Tests\Concerns;
 use App\Models\Comunidade;
 use App\Models\ComunidadeMembro;
 use App\Models\Evento;
-use App\Models\Token;
 use App\Models\User;
+use App\Support\JwtService;
 
 /**
  * Helpers de fixture usados pelos testes de Feature/Unit — espelha
@@ -21,9 +21,7 @@ trait CriaDados
 
     protected function authHeader(User $user): array
     {
-        $token = Token::firstOrCreate(['user_id' => $user->id]);
-
-        return ['Authorization' => 'Bearer '.$token->key];
+        return ['Authorization' => 'Bearer '.JwtService::encode($user)];
     }
 
     protected function makeComunidade(User $criador, array $overrides = []): Comunidade
