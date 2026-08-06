@@ -15,7 +15,7 @@ class ComunidadeUpdateRequest extends FormRequest
     {
         return [
             'nome' => ['sometimes', 'required', 'string'],
-            'descricao' => ['sometimes', 'required', 'string'],
+            'descricao' => ['sometimes', 'required', 'string', 'max:1000'],
             'cidade' => ['sometimes', 'required', 'string', 'max:100'],
             'contato' => ['sometimes', 'required', 'string', 'max:255'],
             'logo_url' => ['sometimes', 'nullable', 'string', 'max:500'],

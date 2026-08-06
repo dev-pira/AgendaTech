@@ -110,6 +110,19 @@ class ComunidadeTest extends TestCase
         $this->assertContains($response->status(), [400, 422]);
     }
 
+    public function test_criar_descricao_acima_de_1000_caracteres_retorna_422(): void
+    {
+        $organizador = $this->makeUser();
+        $payload = $this->payloadComunidade();
+        $payload['descricao'] = str_repeat('a', 1001);
+
+        $response = $this->postJson('/api/comunidades', $payload, $this->authHeader($organizador));
+
+        $response->assertStatus(422);
+        $this->assertEquals('VALIDATION_ERROR', $response->json('error.code'));
+        $this->assertArrayHasKey('descricao', $response->json('error.fields'));
+    }
+
     public function test_criar_nome_duplicado_retorna_409(): void
     {
         $organizador = $this->makeUser();

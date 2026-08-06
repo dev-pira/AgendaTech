@@ -20,7 +20,7 @@ class ComunidadeStoreRequest extends FormRequest
     {
         return [
             'nome' => ['required', 'string'],
-            'descricao' => ['required', 'string'],
+            'descricao' => ['required', 'string', 'max:1000'],
             'cidade' => ['required', 'string', 'max:100'],
             'contato' => ['required', 'string', 'max:255'],
             'logo_url' => ['nullable', 'string', 'max:500'],
