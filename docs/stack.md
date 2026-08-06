@@ -20,21 +20,22 @@ Este documento define a stack tecnológica adotada para o projeto Agenda Tech, c
 
 | Item | Detalhe |
 |------|---------|
-| **Tecnologia** | Node.js |
-| **Versão** | 20 LTS (≥ 20.11.0) |
-| **Framework** | Express.js 4.x |
-| **Linguagem** | JavaScript (com possibilidade de migração para TypeScript) |
+| **Tecnologia** | PHP |
+| **Versão** | 8.2 |
+| **Framework** | Laravel 11.x |
+| **Linguagem** | PHP 8.2 |
 | **Finalidade** | Servidor de API REST para gerenciamento de comunidades, eventos e calendário compartilhado |
 
 ### Justificativa
 
-- **Node.js 20 LTS**: Versão com suporte de longo prazo, estável para produção. Ecossistema JavaScript permite que todas as comunidades contribuam com uma única linguagem no frontend e backend.
-- **Express.js 4.x**: Framework minimalista, amplamente conhecido e documentado. Curva de aprendizado baixa, ideal para um projeto construído ao vivo por múltiplas comunidades. Grande quantidade de middlewares disponíveis para autenticação, validação e logging.
+- **PHP 8.2**: Versão estável com suporte ativo, traz melhorias de desempenho e novos recursos de tipagem (Readonly Properties, Fibers, nunca nulos em tipos de interseção). Amplamente suportado em ambientes de hospedagem compartilhada e cloud.
+- **Laravel 11.x**: Framework PHP mais popular do mundo, com convenções claras que reduzem o tempo de setup. Eloquent ORM facilita o mapeamento relacional, Artisan acelera a geração de código e o ecossistema (Sanctum, Telescope, Pint) cobre as necessidades do projeto sem dependências externas.
 
 ### Pré-requisitos
 
-- Node.js >= 20.11.0
-- npm >= 10.x (incluso com Node.js 20)
+- PHP >= 8.2
+- Composer >= 2.x
+- Extensões PHP: `pdo`, `pdo_pgsql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json`
 
 ---
 
@@ -65,18 +66,18 @@ Este documento define a stack tecnológica adotada para o projeto Agenda Tech, c
 | Item | Detalhe |
 |------|---------|
 | **Tecnologia** | PostgreSQL |
-| **Versão** | 16.x |
+| **Versão** | 9.5 |
 | **Finalidade** | Armazenamento persistente de comunidades, eventos, organizadores e relacionamentos entre entidades |
 
 ### Justificativa
 
-- **PostgreSQL 16**: Banco de dados relacional robusto, open-source e gratuito. Excelente suporte a tipos de dados complexos (JSON, arrays, timestamps com timezone). Ideal para modelagem de dados com relacionamentos (comunidades ↔ eventos ↔ organizadores).
-- Possui ferramentas maduras de migração, backup e monitoramento.
+- **PostgreSQL 9.5**: Banco de dados relacional robusto e open-source. Introduziu `INSERT ... ON CONFLICT DO NOTHING/UPDATE` (upsert nativo), índices BRIN e melhorias no Row-Level Security, recursos utilizados pelo projeto para garantir consistência em operações concorrentes.
+- Suporte sólido a tipos de dados relacionais (timestamps, enums, UUIDs via extensão `uuid-ossp`).
 - Amplamente suportado por provedores de cloud (Heroku, Railway, Supabase, Render).
 
 ### Pré-requisitos
 
-- PostgreSQL >= 16.0
+- PostgreSQL >= 9.5
 - Cliente CLI `psql` disponível no PATH
 
 ---
@@ -96,12 +97,13 @@ Este documento define a stack tecnológica adotada para o projeto Agenda Tech, c
 
 | Ferramenta | Versão | Finalidade |
 |-----------|--------|------------|
-| ESLint | 8.x | Análise estática de código JavaScript/JSX — identifica bugs, padrões ruins e inconsistências |
-| Prettier | 3.x | Formatação automática de código — garante consistência visual em todo o projeto |
+| Laravel Pint | 1.x | Formatação automática de código PHP (baseado no PHP-CS-Fixer) — garante consistência no estilo de código |
+| PHPStan | 1.x | Análise estática de código PHP — detecta erros de tipo, chamadas inválidas e inconsistências sem executar o código |
 
 ### Justificativa (Linting/Formatação)
 
-- **ESLint + Prettier**: Padrão da indústria para projetos JavaScript/TypeScript. Integração nativa com editores de código (VS Code, WebStorm). Permite configuração compartilhada entre todas as comunidades para manter consistência.
+- **Laravel Pint**: Ferramenta oficial do ecossistema Laravel para formatação de código PHP. Zero configuração necessária — usa as convenções do Laravel por padrão. Integração nativa com GitHub Actions.
+- **PHPStan**: Padrão da indústria para análise estática em PHP. Detecta bugs antes de chegarem à produção. Pode ser configurado por nível (0–9) para ajustar a rigorosidade conforme a maturidade do projeto.
 
 ### Pré-requisitos
 
@@ -114,13 +116,14 @@ Este documento define a stack tecnológica adotada para o projeto Agenda Tech, c
 
 | Ferramenta | Versão | Finalidade |
 |-----------|--------|------------|
-| npm | >= 10.x | Gerenciador de pacotes — instalação de dependências, scripts de build e execução |
+| Composer | >= 2.x | Gerenciador de pacotes PHP — instalação de dependências e autoload |
+| npm | >= 10.x | Gerenciador de pacotes para assets do frontend (Vite, integrado ao Laravel) |
 | Git | >= 2.40 | Controle de versão distribuído |
 | GitHub CLI (`gh`) | >= 2.40 | Interação com GitHub via terminal — criação de issues, PRs, labels e milestones |
 
 ### Justificativa
 
-- **npm**: Vem instalado com o Node.js, eliminando necessidade de setup adicional. Lockfile (`package-lock.json`) garante reprodutibilidade de builds.
+- **Composer**: Gerenciador de dependências padrão do ecossistema PHP. Lockfile (`composer.lock`) garante reprodutibilidade de builds.
 - **Git**: Padrão universal de controle de versão.
 - **GitHub CLI**: Permite automação de tarefas de gestão (criação de issues, labels, milestones) via linha de comando.
 
@@ -132,10 +135,11 @@ Este documento define a stack tecnológica adotada para o projeto Agenda Tech, c
 
 | Ferramenta | Versão Mínima | Obrigatório | Comando de Verificação |
 |-----------|---------------|-------------|----------------------|
-| Node.js | 20.11.0 | Sim | `node --version` |
-| npm | 10.0.0 | Sim | `npm --version` |
+| PHP | 8.2 | Sim | `php --version` |
+| Composer | 2.0.0 | Sim | `composer --version` |
 | Git | 2.40.0 | Sim | `git --version` |
-| PostgreSQL | 16.0 | Sim (backend) | `psql --version` |
+| PostgreSQL | 9.5 | Sim (backend) | `psql --version` |
+| Node.js | 20.11.0 | Sim (assets) | `node --version` |
 | GitHub CLI | 2.40.0 | Recomendado | `gh --version` |
 
 ### Sistema Operacional
@@ -149,45 +153,71 @@ O projeto é compatível com:
 
 ## Setup do Ambiente Local
 
-### 1. Instalar Node.js 20 LTS
-
-**Windows/macOS:**
-Baixar o instalador em: https://nodejs.org/en/download (selecionar versão 20 LTS)
-
-**Linux (via nvm — recomendado):**
-```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-source ~/.bashrc
-nvm install 20
-nvm use 20
-```
-
-**Verificação:**
-```bash
-node --version
-# Esperado: v20.x.x
-
-npm --version
-# Esperado: 10.x.x
-```
-
----
-
-### 2. Instalar PostgreSQL 16
+### 1. Instalar PHP 8.2
 
 **Windows:**
-Baixar o instalador em: https://www.postgresql.org/download/windows/
+Baixar o instalador em: https://windows.php.net/download/ (selecionar PHP 8.2 Thread Safe)
+Ou via Scoop: `scoop install php`
 
 **macOS (via Homebrew):**
 ```bash
-brew install postgresql@16
-brew services start postgresql@16
+brew install php@8.2
+brew link php@8.2
 ```
 
 **Linux (Ubuntu/Debian):**
 ```bash
 sudo apt update
-sudo apt install postgresql-16 postgresql-client-16
+sudo apt install software-properties-common
+sudo add-apt-repository ppa:ondrej/php
+sudo apt update
+sudo apt install php8.2 php8.2-pgsql php8.2-mbstring php8.2-xml php8.2-curl php8.2-tokenizer
+```
+
+**Verificação:**
+```bash
+php --version
+# Esperado: PHP 8.2.x
+
+# Verificar extensões obrigatórias
+php -m | grep -E "pdo|pgsql|mbstring"
+```
+
+---
+
+### 2. Instalar Composer
+
+**Windows/macOS/Linux:**
+```bash
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+sudo mv composer.phar /usr/local/bin/composer
+```
+
+**Verificação:**
+```bash
+composer --version
+# Esperado: Composer version 2.x.x
+```
+
+---
+
+### 3. Instalar PostgreSQL 9.5
+
+**Windows:**
+Baixar o instalador em: https://www.postgresql.org/download/windows/ (selecionar versão 9.5)
+
+**macOS (via Homebrew):**
+```bash
+brew install postgresql@9.5
+brew services start postgresql@9.5
+```
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt update
+sudo apt install postgresql-9.5 postgresql-client-9.5
 sudo systemctl start postgresql
 sudo systemctl enable postgresql
 ```
@@ -195,7 +225,7 @@ sudo systemctl enable postgresql
 **Verificação:**
 ```bash
 psql --version
-# Esperado: psql (PostgreSQL) 16.x
+# Esperado: psql (PostgreSQL) 9.5.x
 
 # Testar conexão local
 psql -U postgres -c "SELECT version();"
@@ -203,7 +233,7 @@ psql -U postgres -c "SELECT version();"
 
 ---
 
-### 3. Instalar Git
+### 4. Instalar Git
 
 **Windows:**
 Baixar em: https://git-scm.com/download/win
@@ -227,7 +257,7 @@ git --version
 
 ---
 
-### 4. Instalar GitHub CLI (Recomendado)
+### 5. Instalar GitHub CLI (Recomendado)
 
 **Windows:**
 ```bash
@@ -255,42 +285,60 @@ gh auth login
 
 ---
 
-### 5. Clonar o Repositório e Instalar Dependências
+### 6. Clonar o Repositório e Instalar Dependências
 
 ```bash
 # Clonar o repositório
 git clone https://github.com/seu-usuario/AgendaTech.git
 cd AgendaTech
 
-# Instalar dependências do backend (quando disponível)
-cd backend
-npm install
+# Instalar dependências do backend Laravel
+cd backend/laravel
+composer install
+
+# Configurar variáveis de ambiente
+cp .env.example .env
+php artisan key:generate
+
+# Configurar banco de dados no .env
+# DB_CONNECTION=pgsql
+# DB_HOST=127.0.0.1
+# DB_PORT=5432
+# DB_DATABASE=agendatech
+# DB_USERNAME=postgres
+# DB_PASSWORD=sua_senha
+
+# Rodar migrations
+php artisan migrate
 
 # Instalar dependências do frontend (quando disponível)
-cd ../frontend
+cd ../../frontend
 npm install
 ```
 
 ---
 
-### 6. Verificação Completa do Ambiente
+### 7. Verificação Completa do Ambiente
 
 Execute os comandos abaixo para confirmar que tudo está configurado corretamente:
 
 ```bash
 echo "=== Verificação do Ambiente Agenda Tech ==="
 
-echo "Node.js:"
-node --version
+echo "PHP:"
+php --version
 
-echo "npm:"
-npm --version
+echo "Composer:"
+composer --version
 
 echo "Git:"
 git --version
 
 echo "PostgreSQL:"
 psql --version
+
+echo "Node.js (assets):"
+node --version
 
 echo "GitHub CLI:"
 gh --version
@@ -304,11 +352,12 @@ Se todos os comandos retornarem versões compatíveis com os pré-requisitos lis
 
 ## Referências
 
-- [Node.js — Documentação Oficial](https://nodejs.org/docs/latest-v20.x/api/)
-- [Express.js — Guia](https://expressjs.com/pt-br/)
+- [PHP 8.2 — Documentação Oficial](https://www.php.net/releases/8.2/)
+- [Laravel — Documentação](https://laravel.com/docs)
+- [Laravel Pint — Documentação](https://laravel.com/docs/pint)
+- [PHPStan — Documentação](https://phpstan.org/user-guide/getting-started)
+- [Composer — Documentação](https://getcomposer.org/doc/)
 - [React — Documentação](https://react.dev/)
 - [Vite — Documentação](https://vitejs.dev/)
-- [PostgreSQL 16 — Documentação](https://www.postgresql.org/docs/16/)
+- [PostgreSQL 9.5 — Documentação](https://www.postgresql.org/docs/9.5/)
 - [GitHub Actions — Documentação](https://docs.github.com/pt/actions)
-- [ESLint — Documentação](https://eslint.org/docs/latest/)
-- [Prettier — Documentação](https://prettier.io/docs/en/)

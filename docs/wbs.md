@@ -180,7 +180,7 @@ MS1 (DEVPIRA) ──┬──→ MS2 (DevLimeira) ──┐
 | 3.1 | Setup GitHub Actions (workflows base, triggers, runner) | 3 pontos | Alta |
 | 3.2 | Pipeline de Testes (testes unitários no CI, cobertura, check obrigatório) | 5 pontos | Média |
 | 3.3 | Pipeline de Deploy (deploy automatizado, staging, notificações) | 5 pontos | Baixa |
-| 3.4 | Linting e Formatação (ESLint, Prettier, checks no CI) | 3 pontos | Média |
+| 3.4 | Linting e Formatação (Laravel Pint, PHPStan, checks no CI) | 3 pontos | Média |
 
 **Critérios de conclusão:**
 
@@ -189,9 +189,9 @@ MS1 (DEVPIRA) ──┬──→ MS2 (DevLimeira) ──┐
 - [ ] Relatório de cobertura gerado (target mínimo: 70%)
 - [ ] Check de testes configurado como obrigatório para merge
 - [ ] Pipeline de deploy ativado em merge na main com deploy para staging
-- [ ] ESLint e Prettier configurados e executando no CI
+- [ ] Laravel Pint e PHPStan configurados e executando no CI
 - [ ] Falhas de linting e testes bloqueiam merge de PRs
-- [ ] Configurações locais (`.eslintrc`, `.prettierrc`) alinhadas com CI
+- [ ] Configurações locais (`pint.json`, `.phpstan.neon`) alinhadas com CI
 
 **Total:** 4 tarefas / 16 story points
 
