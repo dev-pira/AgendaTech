@@ -12,6 +12,7 @@
 - [Comunidades](#comunidades)
 - [Membros](#membros)
 - [Eventos](#eventos)
+- [Calendário](#calendário)
 
 ---
 
@@ -501,3 +502,55 @@ curl -X DELETE http://localhost:8000/api/eventos/a2708e... \
 ```
 
 **Respostas:** `204` · `400` (evento já ocorreu) · `401` · `403` · `404`
+
+---
+
+## Calendário
+
+Endpoint agregador feito especificamente para a tela de calendário compartilhado do frontend (DevItape) — devolve todos os eventos de um período de uma vez (sem paginação), com metadados de comunidade prontos para color-coding.
+
+### `GET /api/calendario`
+
+Público. Diferente de `GET /api/eventos`, aqui `data_inicio`/`data_fim` são **obrigatórios**.
+
+**Query params**
+
+| Param | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `data_inicio` | date (`YYYY-MM-DD`) | Sim | Início do período |
+| `data_fim` | date (`YYYY-MM-DD`) | Sim | Fim do período — deve ser igual ou posterior a `data_inicio` |
+| `comunidade_id` | uuid | Não | Filtra por comunidade |
+| `cidade` | string | Não | Filtra pela cidade da comunidade do evento |
+| `tipo` | `presencial`\|`online`\|`hibrido` | Não | Filtra por tipo |
+
+```bash
+curl "http://localhost:8000/api/calendario?data_inicio=2026-09-01&data_fim=2026-09-30&cidade=Limeira"
+```
+
+```json
+{
+  "eventos": [
+    {
+      "id": "a2708e...",
+      "titulo": "Tech Talk - Introdução a Laravel",
+      "descricao": "Uma palestra introdutória sobre o framework Laravel.",
+      "data": "2026-09-10",
+      "hora_inicio": "19:00:00",
+      "hora_fim": "21:00:00",
+      "local": "Online",
+      "tipo": "online",
+      "comunidade": { "id": "9c1f0e1a-...", "nome": "DevLimeira", "cidade": "Limeira" },
+      "organizador": { "id": "3fa2...", "nome": "Fábio Baldin" },
+      "url_online": "https://meet.example.com/tech-talk",
+      "criado_em": "2026-08-20T10:00:00.000000Z",
+      "atualizado_em": "2026-08-20T10:00:00.000000Z"
+    }
+  ],
+  "total": 1,
+  "periodo": { "data_inicio": "2026-09-01", "data_fim": "2026-09-30" }
+}
+```
+
+Nota: o objeto de evento aqui é o mesmo formato de [`GET /api/eventos/{id}`](#get-apieventosid) (`EventoDetailResource`) — o protótipo Node original devolvia um formato mais enxuto (sem `organizador` aninhado), mas reaproveitar o resource padrão evita duplicar a serialização e mantém o formato de evento consistente em toda a API.
+
+**Respostas:** `200` · `422` (`data_inicio`/`data_fim` ausentes, `data_fim` antes de `data_inicio`, ou `comunidade_id`/`tipo` inválidos)

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CalendarioController;
 use App\Http\Controllers\Api\ComunidadeController;
 use App\Http\Controllers\Api\EventoController;
 use App\Http\Controllers\Api\MembroController;
@@ -29,6 +30,10 @@ Route::middleware('auth:api')->group(function () {
 
 Route::get('/eventos', [EventoController::class, 'index']);
 Route::get('/eventos/{evento}', [EventoController::class, 'show']);
+
+// Endpoint agregador pra tela de calendário compartilhado (DevItape) —
+// issue #54 (porte do Node, nunca migrado junto com o resto da API).
+Route::get('/calendario', [CalendarioController::class, 'index']);
 Route::middleware('auth:api')->group(function () {
     Route::post('/eventos', [EventoController::class, 'store']);
     Route::put('/eventos/{evento}', [EventoController::class, 'update']);
