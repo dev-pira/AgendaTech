@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Models\Token;
+use App\Support\JwtService;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
@@ -28,8 +28,10 @@ class AppServiceProvider extends ServiceProvider
         // único recurso (ex.: GET /api/comunidades/{id}).
         JsonResource::withoutWrapping();
 
-        // Autenticação Bearer simples usada pela API — equivalente ao
-        // AuthBearer (django-ninja HttpBearer) do backend Django.
+        // Autenticação Bearer via JWT — equivalente ao AuthBearer
+        // (django-ninja HttpBearer) do backend Django e ao
+        // requireAuth (jsonwebtoken) do backend Node. Ver issue #52:
+        // token opaco em tabela (`tokens`) trocado por JWT stateless.
         Auth::viaRequest('bearer-token', function ($request) {
             $header = $request->header('Authorization', '');
 
@@ -37,9 +39,7 @@ class AppServiceProvider extends ServiceProvider
                 return null;
             }
 
-            $key = trim(substr($header, 7));
-
-            return Token::with('user')->where('key', $key)->first()?->user;
+            return JwtService::decode(trim(substr($header, 7)));
         });
     }
 }

@@ -18,11 +18,13 @@
 
 ## Autenticação
 
-A API usa **Bearer token** simples (não é JWT — um token opaco por usuário, gerado sob demanda). Endpoints de escrita (`POST`/`PUT`/`DELETE`) exigem o header `Authorization: Bearer <token>`; endpoints de leitura (`GET`) são públicos.
+A API usa **JWT** (JSON Web Token, HS256 — ver `App\Support\JwtService`), stateless: não há tabela de tokens, a validade inteira (assinatura + expiração) vive no próprio token. Endpoints de escrita (`POST`/`PUT`/`DELETE`) exigem o header `Authorization: Bearer <token>`; endpoints de leitura (`GET`) são públicos, exceto os de [Membros](#membros).
+
+Token expira em `JWT_TTL` minutos (padrão 60, configurável no `.env`) — depois disso, `POST /api/auth/token` de novo pra obter um novo.
 
 ### `POST /api/auth/token`
 
-Troca `username`/`password` por um token de acesso. Cria o token na primeira chamada; chamadas seguintes reaproveitam o mesmo token (`Token::firstOrCreate`).
+Troca `username`/`password` por um JWT.
 
 **Body**
 
@@ -46,15 +48,17 @@ curl -X POST http://localhost:8000/api/auth/token \
 ```
 
 ```json
-{ "token": "aG9nZS1kZS10b2tlbi1kZS02NC1jaGFyYWN0ZXJlcw..." }
+{ "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIuLi4iLCJpYXQiOjE3ODYwNTI5MTUsImV4cCI6MTc4NjA1NjUxNX0.oTY3nlsLqoslgnumQkuzlS5XL0fo6GH9IPjSSLMjPYw" }
 ```
 
 Use o token nas próximas chamadas:
 
 ```bash
 curl http://localhost:8000/api/comunidades \
-  -H "Authorization: Bearer aG9nZS1kZS10b2tlbi1kZS02NC1jaGFyYWN0ZXJlcw..."
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
 ```
+
+Token inválido, expirado, malformado ou de assinatura incorreta → sempre `401 UNAUTHENTICATED` (nunca 500), com o mesmo [envelope de erro](#formato-de-erro).
 
 ---
 
