@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\ApiErrorResponder;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,4 +20,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*'),
         );
+
+        // Tarefa 2.4 (Validações, docs/wbs.md): erros da API sempre no
+        // formato { "error": { "code": "...", "message": "..." } }.
+        $exceptions->render(function (Throwable $e, Request $request) {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+
+            return ApiErrorResponder::render($e);
+        });
     })->create();
