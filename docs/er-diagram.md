@@ -1,7 +1,7 @@
 # Diagrama ER — Agenda Tech (Backend)
 
 > Referente à tarefa [2.1 Modelagem de Dados](../backend/laravel/database/migrations) (DevLimeira, MS2: Backend API).
-> Schema implementado em `backend/laravel/database/migrations` (Laravel 11 / PostgreSQL, ver [`docs/stack.md`](./stack.md)).
+> Schema implementado em `backend/laravel/database/migrations` (Laravel 12 / PostgreSQL, ver [`docs/stack.md`](./stack.md)).
 
 ## Diagrama
 

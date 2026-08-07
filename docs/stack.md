@@ -22,14 +22,14 @@ Este documento define a stack tecnológica adotada para o projeto Agenda Tech, c
 |------|---------|
 | **Tecnologia** | PHP |
 | **Versão** | 8.2 |
-| **Framework** | Laravel 11.x |
+| **Framework** | Laravel 12.x |
 | **Linguagem** | PHP 8.2 |
 | **Finalidade** | Servidor de API REST para gerenciamento de comunidades, eventos e calendário compartilhado |
 
 ### Justificativa
 
 - **PHP 8.2**: Versão estável com suporte ativo, traz melhorias de desempenho e novos recursos de tipagem (Readonly Properties, Fibers, nunca nulos em tipos de interseção). Amplamente suportado em ambientes de hospedagem compartilhada e cloud.
-- **Laravel 11.x**: Framework PHP mais popular do mundo, com convenções claras que reduzem o tempo de setup. Eloquent ORM facilita o mapeamento relacional, Artisan acelera a geração de código e o ecossistema (Sanctum, Telescope, Pint) cobre as necessidades do projeto sem dependências externas.
+- **Laravel 12.x**: Framework PHP mais popular do mundo, com convenções claras que reduzem o tempo de setup. Eloquent ORM facilita o mapeamento relacional, Artisan acelera a geração de código e o ecossistema (Sanctum, Telescope, Pint) cobre as necessidades do projeto sem dependências externas. Atualizado de 11.x para 12.61.1 em 06/08 (PR #58) para corrigir 2 vulnerabilidades reais do Dependabot (CRLF injection e Signed URL Path Confusion); a versão 12.x roda no mesmo PHP 8.2, sem impacto na compatibilidade com o hosting da KingHost.
 
 ### Pré-requisitos
 
