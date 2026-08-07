@@ -1,7 +1,0 @@
-<% content_for :title, "Excluir evento" %>
-
-<h1>Excluir evento</h1>
-<p>Tem certeza que deseja excluir o evento <strong><%= @evento.titulo %></strong>? Essa ação não pode ser desfeita.</p>
-
-<%= button_to "Confirmar exclusão", confirm_delete_evento_path(@evento), method: :delete, class: "btn-danger" %>
-<%= link_to "Cancelar", evento_path(@evento), class: "btn" %>

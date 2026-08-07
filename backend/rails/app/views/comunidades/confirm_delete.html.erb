@@ -1,7 +1,0 @@
-<% content_for :title, "Excluir comunidade" %>
-
-<h1>Excluir comunidade</h1>
-<p>Tem certeza que deseja excluir a comunidade <strong><%= @comunidade.nome %></strong>? Essa ação não pode ser desfeita.</p>
-
-<%= button_to "Confirmar exclusão", confirm_delete_comunidade_path(@comunidade), method: :delete, class: "btn-danger" %>
-<%= link_to "Cancelar", comunidade_path(@comunidade), class: "btn" %>
