@@ -1,7 +1,7 @@
 # API REST — Agenda Tech
 
 > Referente à tarefa [2.5 Documentação API](https://github.com/dev-pira/AgendaTech/issues/29) (DevLimeira, MS2: Backend API).
-> Base local: `http://localhost:8000/api`. Backend: Laravel 11 / PHP 8.2 (ver [`docs/stack.md`](./stack.md)). Schema: [`docs/er-diagram.md`](./er-diagram.md).
+> Base local: `http://localhost:8000/api`. Backend: Laravel 12 / PHP 8.2 (ver [`docs/stack.md`](./stack.md)). Schema: [`docs/er-diagram.md`](./er-diagram.md).
 
 ## Sumário
 
