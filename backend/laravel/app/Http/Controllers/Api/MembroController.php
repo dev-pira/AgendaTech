@@ -25,6 +25,13 @@ class MembroController extends Controller
 
     public function index(Request $request, Comunidade $comunidade)
     {
+        // Lista inclui e-mail dos membros (MembroGestaoResource) — só quem
+        // organiza essa comunidade pode ver, mesma regra de store/updatePapel/
+        // destroy abaixo. Ver issue #75.
+        if (! Permissions::isOrganizador($request->user('api'), $comunidade)) {
+            abort(403, 'Apenas organizadores da comunidade podem gerenciar membros.');
+        }
+
         $query = $comunidade->membrosVinculo()->with('usuario');
 
         if ($papel = $request->query('papel')) {

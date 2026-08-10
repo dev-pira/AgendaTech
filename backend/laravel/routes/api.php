@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Route;
 // Espelha core/api.py (Django), construído com django-ninja. Aqui o
 // equivalente é um conjunto de controllers REST "finos" por recurso.
 
-Route::post('/auth/token', [AuthController::class, 'obterToken']);
+// Issue #76: sem throttle, dava pra tentar senha infinitas vezes.
+Route::post('/auth/token', [AuthController::class, 'obterToken'])->middleware('throttle:5,1');
 
 Route::get('/comunidades', [ComunidadeController::class, 'index']);
 Route::get('/comunidades/{comunidade}', [ComunidadeController::class, 'show']);
