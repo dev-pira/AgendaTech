@@ -66,18 +66,18 @@ Este documento define a stack tecnológica adotada para o projeto Agenda Tech, c
 | Item | Detalhe |
 |------|---------|
 | **Tecnologia** | PostgreSQL |
-| **Versão** | 9.5 |
+| **Versão** | 13 |
 | **Finalidade** | Armazenamento persistente de comunidades, eventos, organizadores e relacionamentos entre entidades |
 
 ### Justificativa
 
-- **PostgreSQL 9.5**: Banco de dados relacional robusto e open-source. Introduziu `INSERT ... ON CONFLICT DO NOTHING/UPDATE` (upsert nativo), índices BRIN e melhorias no Row-Level Security, recursos utilizados pelo projeto para garantir consistência em operações concorrentes.
+- **PostgreSQL 13**: Banco de dados relacional robusto e open-source. Oferece `INSERT ... ON CONFLICT DO NOTHING/UPDATE` (upsert nativo), índices BRIN e Row-Level Security, recursos utilizados pelo projeto para garantir consistência em operações concorrentes.
 - Suporte sólido a tipos de dados relacionais (timestamps, enums, UUIDs via extensão `uuid-ossp`).
 - Amplamente suportado por provedores de cloud (Heroku, Railway, Supabase, Render).
 
 ### Pré-requisitos
 
-- PostgreSQL >= 9.5
+- PostgreSQL >= 13
 - Cliente CLI `psql` disponível no PATH
 
 ---
@@ -138,7 +138,7 @@ Este documento define a stack tecnológica adotada para o projeto Agenda Tech, c
 | PHP | 8.2 | Sim | `php --version` |
 | Composer | 2.0.0 | Sim | `composer --version` |
 | Git | 2.40.0 | Sim | `git --version` |
-| PostgreSQL | 9.5 | Sim (backend) | `psql --version` |
+| PostgreSQL | 13 | Sim (backend) | `psql --version` |
 | Node.js | 20.11.0 | Sim (assets) | `node --version` |
 | GitHub CLI | 2.40.0 | Recomendado | `gh --version` |
 
@@ -200,24 +200,23 @@ sudo mv composer.phar /usr/local/bin/composer
 composer --version
 # Esperado: Composer version 2.x.x
 ```
-
 ---
 
-### 3. Instalar PostgreSQL 9.5
+### 3. Instalar PostgreSQL 13
 
 **Windows:**
-Baixar o instalador em: https://www.postgresql.org/download/windows/ (selecionar versão 9.5)
+Baixar o instalador em: https://www.postgresql.org/download/windows/ (selecionar versão 13)
 
 **macOS (via Homebrew):**
 ```bash
-brew install postgresql@9.5
-brew services start postgresql@9.5
+brew install postgresql@13
+brew services start postgresql@13
 ```
 
 **Linux (Ubuntu/Debian):**
 ```bash
 sudo apt update
-sudo apt install postgresql-9.5 postgresql-client-9.5
+sudo apt install postgresql-13 postgresql-client-13
 sudo systemctl start postgresql
 sudo systemctl enable postgresql
 ```
@@ -225,7 +224,7 @@ sudo systemctl enable postgresql
 **Verificação:**
 ```bash
 psql --version
-# Esperado: psql (PostgreSQL) 9.5.x
+# Esperado: psql (PostgreSQL) 13.x
 
 # Testar conexão local
 psql -U postgres -c "SELECT version();"
@@ -359,5 +358,5 @@ Se todos os comandos retornarem versões compatíveis com os pré-requisitos lis
 - [Composer — Documentação](https://getcomposer.org/doc/)
 - [React — Documentação](https://react.dev/)
 - [Vite — Documentação](https://vitejs.dev/)
-- [PostgreSQL 9.5 — Documentação](https://www.postgresql.org/docs/9.5/)
+- [PostgreSQL 13 — Documentação](https://www.postgresql.org/docs/13/)
 - [GitHub Actions — Documentação](https://docs.github.com/pt/actions)
