@@ -7,7 +7,9 @@ Guia de referência para quem for construir um frontend novo (React ou outro) co
 | Ambiente   | URL base da API                                              |
 |------------|---------------------------------------------------------------|
 | Local (dev)| `http://localhost:8000/api`                                   |
-| Produção   | `https://agendatech.devpira.web88f08.kinghost.net/api`        |
+| Produção   | `http://agendatech.devpira.web88f08.kinghost.net/api` (**HTTP, não HTTPS** — ver aviso abaixo) |
+
+> ⚠️ **HTTPS quebrado nesse subdomínio.** O certificado do king.host é um wildcard de 1 nível só (`*.kinghost.net`), que cobre `algumacoisa.kinghost.net` mas **não** cobre hostnames com mais de um nível como `agendatech.devpira.web88f08.kinghost.net` (3 níveis). Testado com `curl`/`openssl`: erro de nome de certificado incompatível — a request nem completa o handshake TLS. Em HTTP funciona normal (200 OK), mas se o frontend do Paulo for hospedado em HTTPS (praticamente garantido — Vercel/Lovable/etc forçam HTTPS), o browser vai bloquear qualquer fetch pra uma API em HTTP por **mixed content**, e se apontar pra API em HTTPS vai falhar por **certificado inválido**. Isso trava a integração dos dois lados — **bloqueador mais urgente que o CORS**, precisa resolver antes do Paulo começar (ver seção de gaps).
 
 ## Autenticação
 
@@ -66,10 +68,12 @@ Body (`POST`/`PUT`, campos de `PUT` todos opcionais/`sometimes`):
 }
 ```
 
-Resposta (`ComunidadeResource`):
+`GET /comunidades` retorna paginado (envelope confirmado testando ao vivo — não é um array puro):
 ```json
-{ "id": "uuid", "nome": "...", "descricao": "...", "cidade": "...", "contato": "...", "logo_url": "...", "criado_em": "...", "total_membros": 1 }
+{ "dados": [ { "id": "uuid", "nome": "...", "descricao": "...", "cidade": "...", "contato": "...", "logo_url": "...", "criado_em": "...", "total_membros": 1 } ], "paginacao": { "pagina_atual": 1, "total_paginas": 1, "total_itens": 1, "limite": 20 } }
 ```
+
+Cada item da lista segue o shape de `ComunidadeResource`.
 
 `GET /comunidades/{id}` retorna o detalhe (`ComunidadeDetailResource`), que acrescenta:
 ```json
@@ -115,7 +119,7 @@ Body (`PUT` com todos os campos `sometimes`):
 }
 ```
 
-Resposta (`EventoResource`):
+`GET /eventos` também vem no mesmo envelope paginado de `/comunidades` (`dados` + `paginacao`), com cada item no shape de `EventoResource`:
 ```json
 { "id": "uuid", "titulo": "...", "descricao": "...", "data": "YYYY-MM-DD", "hora_inicio": "...", "hora_fim": "...", "local": "...", "tipo": "...", "comunidade": { "id": "uuid", "nome": "..." }, "organizador": { "id": "uuid", "nome": "..." } }
 ```
@@ -130,12 +134,13 @@ GET /api/calendario?data_inicio=YYYY-MM-DD&data_fim=YYYY-MM-DD&comunidade_id=&ci
 
 `data_inicio` e `data_fim` são obrigatórios (diferente da listagem genérica de eventos, onde são opcionais). `comunidade_id`, `cidade` e `tipo` são filtros opcionais.
 
-## CORS — pendência antes do frontend novo poder chamar de outro domínio
+## CORS
 
-Hoje **não há middleware de CORS registrado** (`bootstrap/app.php` → `withMiddleware` está vazio). Se o frontend do Paulo for hospedado em domínio diferente do backend (bem provável — ex. Lovable/Vercel), o browser vai bloquear as chamadas por CORS até isso ser configurado. Precisa habilitar `Illuminate\Http\Middleware\HandleCors` + `config/cors.php` liberando o(s) origin(s) do frontend antes de testar a integração de ponta a ponta.
+Corrigido no PR #70 (`config/cors.php` + `CORS_ALLOWED_ORIGINS` no `.env`, default `*`). Precisa estar mergeado **e deployado** em produção antes do frontend do Paulo conseguir chamar a API do browser.
 
 ## Gaps conhecidos / decisões pendentes antes da troca completa
 
-1. **Sem endpoint de cadastro via API** — hoje só o formulário web (Blade) cria usuário.
-2. **CORS não configurado** — ver acima.
-3. Depois que o frontend novo estiver de pé e validado: decidir se `routes/web.php` (UI Blade atual) é removida ou mantida como fallback.
+1. **HTTPS quebrado no domínio de produção** (ver aviso em Base URLs) — **bloqueador mais urgente**. Sem resolver isso, nenhum frontend hospedado em HTTPS consegue falar com a API em produção (mixed content ou cert inválido, dos dois lados). Precisa de um subdomínio com certificado válido — seja emitindo SSL pro hostname atual pelo Kingpainel (se o painel permitir por-subdomínio), seja usando um hostname de 1 nível só (dentro do wildcard `*.kinghost.net`), seja apontando um domínio próprio com Let's Encrypt.
+2. **CORS** — resolvido no PR #70, falta merge + deploy.
+3. **Sem endpoint de cadastro via API** — hoje só o formulário web (Blade) cria usuário.
+4. Depois que o frontend novo estiver de pé e validado: decidir se `routes/web.php` (UI Blade atual) é removida ou mantida como fallback.
