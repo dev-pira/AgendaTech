@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/laravel/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/laravel/**'
+      - '.github/workflows/ci.yml'
+
+jobs:
+  backend:
+    name: Backend (Laravel)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/laravel
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+          coverage: none
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: backend/laravel/vendor
+          key: composer-${{ hashFiles('backend/laravel/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Configurar .env de teste
+        run: cp .env.example .env
+
+      - name: Gerar APP_KEY
+        run: php artisan key:generate
+
+      - name: Verificar estilo de código (Pint)
+        run: vendor/bin/pint --test
+
+      - name: Rodar testes (PHPUnit, SQLite em memória)
+        run: php artisan test
+
+  # Frontend job entra aqui quando a issue 4.1 (Setup Projeto Frontend) for concluída.
+  # Por enquanto frontend/ está vazio (só .gitkeep), não há o que buildar/testar ainda.
