@@ -10,6 +10,14 @@ const TOKEN_KEY = 'agendatech:token';
  */
 export const MOCK_ENABLED = import.meta.env.VITE_USE_MOCK === 'true';
 
+if (!MOCK_ENABLED && !import.meta.env.VITE_API_URL) {
+  console.warn(
+    '[agendatech] VITE_USE_MOCK=false mas VITE_API_URL não está definida — chamadas de API vão ' +
+      "cair em '/api' relativo ao domínio atual, o que provavelmente não existe. Ver " +
+      'docs/development/backend-integration.md.',
+  );
+}
+
 export class HttpError extends Error {
   status: number;
   details?: unknown;
