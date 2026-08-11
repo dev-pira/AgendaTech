@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CalendarioController;
 use App\Http\Controllers\Api\ComunidadeController;
+use App\Http\Controllers\Api\DeployController;
 use App\Http\Controllers\Api\EventoController;
 use App\Http\Controllers\Api\MembroController;
 use Illuminate\Support\Facades\Route;
@@ -12,6 +13,12 @@ use Illuminate\Support\Facades\Route;
 
 // Issue #76: sem throttle, dava pra tentar senha infinitas vezes.
 Route::post('/auth/token', [AuthController::class, 'obterToken'])->middleware('throttle:5,1');
+
+// Gatilho de deploy via HTTP (substitui SSH no GitHub Actions - ver
+// docs/deploy.md). Autenticado por segredo compartilhado (X-Deploy-Secret),
+// nao por auth:api - throttle so pra limitar tentativa de forca bruta
+// no segredo, nao impede deploy legitimo em uso normal.
+Route::post('/internal/deploy', [DeployController::class, 'trigger'])->middleware('throttle:10,1');
 
 Route::get('/comunidades', [ComunidadeController::class, 'index']);
 Route::get('/comunidades/{comunidade}', [ComunidadeController::class, 'show']);

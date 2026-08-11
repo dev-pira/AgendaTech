@@ -52,16 +52,27 @@ Senha só existe no `.env` do servidor, nunca versionada. Driver `pdo_pgsql` con
 
 ## Deploy automático
 
-O GitHub Actions (`deploy.yml`, SSH via `appleboy/ssh-action`) **não funciona** nesse ambiente — testado 3x, sempre falha com `dial tcp ...: i/o timeout`. O king.host bloqueia conexões SSH de entrada vindas de fora da faixa de IP autorizada, e a faixa de IPs do GitHub Actions é dinâmica/gigante (infra Azure), impossível de cadastrar de forma confiável num allowlist.
+O GitHub Actions (`deploy.yml`, SSH via `appleboy/ssh-action`) **não funciona** nesse ambiente — testado 3x, sempre falha com `dial tcp ...: i/o timeout`. O king.host bloqueia conexões SSH de entrada vindas de fora da faixa de IP autorizada, e a faixa de IPs do GitHub Actions é dinâmica/gigante (infra Azure), impossível de cadastrar de forma confiável num allowlist. Confirmado também que o próprio `crontab -e`/`crontab -l` via SSH dá "permission denied" nesse shell (mesma gaiola que já bloqueava `rsync`/`find`) — não dá pra agendar nada direto no shell.
 
-**Solução adotada:** deploy pull-based via CronJob do Kingpainel, rodando `deploy_agendatech.sh` periodicamente (idealmente a cada 1-5 min, conforme o menor intervalo que o painel permitir). O script faz curto-circuito quando não há commit novo (compara `HEAD` local com `origin/main` antes de rodar composer/migrate/cache), então rodar com frequência alta é seguro e leve.
+**Solução adotada: gatilho de deploy via HTTP.** Em vez de o GitHub Actions tentar SSH (bloqueado), o workflow faz um `curl` simples numa rota do próprio Laravel (`POST /api/internal/deploy`, `App\Http\Controllers\Api\DeployController`) — o mesmo tipo de chamada HTTP que os steps de "Notify success/failure" já faziam contra a API do GitHub, nunca teve bloqueio. A rota autentica via segredo compartilhado (header `X-Deploy-Secret`, comparação `hash_equals`) e roda `deploy_agendatech.sh` via `shell_exec` — confirmado que `disable_functions` está vazio no PHP desse host (checado em 10/08/2026), então `shell_exec`/`exec` funcionam normalmente.
+
+Configuração necessária (uma vez só):
+1. Gerar um segredo: `openssl rand -hex 32`.
+2. Colocar esse valor em `DEPLOY_WEBHOOK_SECRET` no `.env` do servidor.
+3. Cadastrar o mesmo valor como secret `DEPLOY_WEBHOOK_SECRET` no GitHub Actions do repositório.
+
+Deploy então acontece automaticamente a cada push em `main` — em segundos, sem custo, sem depender de nenhuma máquina externa ligada.
+
+**Alternativas avaliadas e descartadas:**
+- *CronJob pago do Kingpainel* (R$7,90/pacote de 20 tarefas) — descoberto que é baseado em URL fixa no domínio principal da conta (`www.devpira.com.br`, não dá pra apontar pro subdomínio do agendatech) e o campo "Minuto" não parece suportar intervalos tipo `*/5`, só um minuto fixo por hora. Não atende.
+- *Watcher rodando numa máquina local* (poll no GitHub + SSH usando o IP já autorizado do desenvolvedor) — funcionaria, mas depende da máquina estar ligada. Descartado em favor do gatilho HTTP, que não depende de nada externo.
 
 ### Rollback
 
-Com deploy pull-based, o `main` do GitHub é a fonte da verdade — o cron sempre convergir pra ele. Rollback correto:
+Com deploy disparado a cada push, o `main` do GitHub é a fonte da verdade. Rollback correto:
 
-- **Não urgente:** `git revert` do commit problemático direto no `main`. O próximo ciclo do cron entrega o conserto sozinho.
-- **Urgente (não pode esperar o próximo ciclo):** pausar o CronJob no Kingpainel → rodar `bash ~/rollback_agendatech.sh` manualmente via SSH → confirmar que voltou a funcionar → `git revert` no `main` pra consertar de verdade → reativar o CronJob.
+- **Não urgente:** `git revert` do commit problemático direto no `main` e dar push — o próprio push já dispara o deploy do conserto via o gatilho HTTP, automático.
+- **Urgente:** rodar `bash ~/rollback_agendatech.sh` manualmente via SSH → confirmar que voltou a funcionar → depois `git revert` no `main` pra consertar a fonte da verdade também (senão o próximo push de qualquer coisa em cima do commit ruim reintroduz o bug).
 
 ## Chave SSH do GitHub Actions (histórico, hoje sem uso efetivo)
 
