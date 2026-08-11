@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    // Gatilho de deploy via HTTP - substitui o SSH do GitHub Actions, que
+    // nao funciona nesse host (IP dinamico do runner bloqueado pelo
+    // firewall do king.host). Ver docs/deploy.md.
+    'deploy' => [
+        'secret' => env('DEPLOY_WEBHOOK_SECRET'),
+    ],
+
 ];

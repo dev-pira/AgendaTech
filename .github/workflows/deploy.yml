@@ -12,14 +12,20 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script: bash ~/deploy_agendatech.sh
+      # O SSH (appleboy/ssh-action) nunca funcionou nesse host: o
+      # king.host bloqueia SSH de entrada de fora da faixa de IP
+      # autorizada, e a faixa de IPs do runner do GitHub Actions e
+      # dinamica demais pra cadastrar (3/3 execucoes anteriores falharam
+      # com "dial tcp ...: i/o timeout"). Troca pra um gatilho HTTP -
+      # ver App\Http\Controllers\Api\DeployController e docs/deploy.md.
+      # URL em HTTP (nao HTTPS) porque o certificado do king.host nao
+      # cobre esse subdominio de 3 niveis - ver issue #71. Trocar pra
+      # https:// quando isso for resolvido.
+      - name: Disparar deploy via HTTP
+        run: |
+          curl --fail --max-time 180 -X POST \
+            "http://agendatech.devpira.web88f08.kinghost.net/api/internal/deploy" \
+            -H "X-Deploy-Secret: ${{ secrets.DEPLOY_WEBHOOK_SECRET }}"
 
       - name: Notify success
         if: success()
