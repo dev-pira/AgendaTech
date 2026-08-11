@@ -35,8 +35,9 @@ atômico (`docs/development/git-workflow.md`), tipicamente `chore(deploy): ...` 
 - [ ] 5. Configurar variáveis de ambiente por ambiente Vercel
   - [ ] 5.1 `VITE_USE_MOCK=true` em Production, Preview e Development (tabela do design.md)
     - _Requirements: 2.1, 2.2, 2.4_
-  - [ ] 5.2 Documentar em `frontend/README.md` como alternar para `VITE_USE_MOCK=false` +
-        `VITE_API_URL` quando o backend publicar — sem exigir mudança de código
+  - [x] 5.2 Documentar em `frontend/README.md` como alternar para `VITE_USE_MOCK=false` +
+        `VITE_API_URL` quando o backend publicar — sem exigir mudança de código. Runbook
+        dedicado em `docs/development/backend-integration.md`, linkado a partir do README
     - _Requirements: 2.3_
 
 - [ ] 6. Conectar o repositório GitHub ao Vercel_Project

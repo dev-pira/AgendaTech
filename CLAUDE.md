@@ -74,5 +74,6 @@ só em build+lint passando.
 | `docs/development/build-log.md` | Retrospectiva de como o frontend foi construído |
 | `docs/development/engineering-principles.md` | Clean Code/SOLID/acessibilidade aplicados |
 | `docs/development/git-workflow.md` | Commits atômicos + SemVer |
+| `docs/development/backend-integration.md` | Runbook pra quem publicar o backend conectar o frontend (env vars) |
 | `.kiro/specs/` | Specs (requirements → design → tasks), incluindo o plano de CI/CD |
 | `CONTRIBUTING.md` | Convenção de commits, branches e fluxo de PR (regras gerais do repo) |

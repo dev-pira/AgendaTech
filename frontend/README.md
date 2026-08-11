@@ -61,7 +61,9 @@ Login de demonstração (mesmo e-mail do seed do backend): `organizador@devlimei
 `senha123`. Os dados resetam a cada reload da página — é em memória, não persiste.
 
 Quando o backend real estiver disponível, é só voltar `VITE_USE_MOCK=false` (ou remover a
-variável) e apontar `VITE_API_URL` para ele — nenhum código de página muda.
+variável) e apontar `VITE_API_URL` para ele — nenhum código de página muda. Runbook completo pra
+quem for publicar o backend e conectar aqui:
+[`docs/development/backend-integration.md`](../docs/development/backend-integration.md).
 
 ### 4. Build de produção
 
