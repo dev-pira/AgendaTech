@@ -29,7 +29,7 @@ class ComunidadeController extends Controller
 
         $query = Comunidade::query()->withCount('membros');
         if ($busca !== '') {
-            $query->where('nome', 'like', '%'.$busca.'%');
+            $query->whereRaw('LOWER(nome) LIKE ?', ['%'.mb_strtolower($busca).'%']);
         }
         if ($cidade !== '') {
             $query->whereRaw('LOWER(cidade) = ?', [mb_strtolower($cidade)]);

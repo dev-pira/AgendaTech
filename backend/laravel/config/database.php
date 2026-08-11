@@ -58,9 +58,12 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
+            // Só referencia a constante PDO::MYSQL_ATTR_SSL_CA quando ela for
+            // realmente usada — no PHP 8.5 essa constante está deprecated, e
+            // apenas mencioná-la já emite o warning mesmo sem MySQL em uso.
+            'options' => extension_loaded('pdo_mysql') && env('MYSQL_ATTR_SSL_CA') ? [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            ] : [],
         ],
 
         'mariadb' => [
@@ -78,9 +81,10 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
+            // Ver comentário equivalente no bloco 'mysql' acima.
+            'options' => extension_loaded('pdo_mysql') && env('MYSQL_ATTR_SSL_CA') ? [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            ] : [],
         ],
 
         'pgsql' => [
