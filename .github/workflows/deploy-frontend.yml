@@ -52,5 +52,8 @@ jobs:
           # steps "run:", não pra steps "uses:" como este - por isso o
           # caminho aqui precisa do prefixo frontend/ explicito.
           local-dir: ./frontend/dist/
-          server-dir: ./www/agendatech/app/
+          # O login FTP do king.host ja cai dentro de ~/www/ (confirmado
+          # empiricamente - ver docs/deploy.md), entao NAO repete "www/"
+          # aqui, senao cria ~/www/www/agendatech/app/ por engano.
+          server-dir: ./agendatech/app/
           dangerous-clean-slate: true
