@@ -52,20 +52,27 @@ Senha só existe no `.env` do servidor, nunca versionada. Driver `pdo_pgsql` con
 
 ## Deploy automático
 
-O GitHub Actions (`deploy.yml`, SSH via `appleboy/ssh-action`) **não funciona** nesse ambiente — testado 3x, sempre falha com `dial tcp ...: i/o timeout`. O king.host bloqueia conexões SSH de entrada vindas de fora da faixa de IP autorizada, e a faixa de IPs do GitHub Actions é dinâmica/gigante (infra Azure), impossível de cadastrar de forma confiável num allowlist. Confirmado também que o próprio `crontab -e`/`crontab -l` via SSH dá "permission denied" nesse shell (mesma gaiola que já bloqueava `rsync`/`find`) — não dá pra agendar nada direto no shell.
+### Frontend — resolvido (FTP)
 
-**Solução adotada: gatilho de deploy via HTTP.** Em vez de o GitHub Actions tentar SSH (bloqueado), o workflow faz um `curl` simples numa rota do próprio Laravel (`POST /api/internal/deploy`, `App\Http\Controllers\Api\DeployController`) — o mesmo tipo de chamada HTTP que os steps de "Notify success/failure" já faziam contra a API do GitHub, nunca teve bloqueio. A rota autentica via segredo compartilhado (header `X-Deploy-Secret`, comparação `hash_equals`) e roda `deploy_agendatech.sh` via `shell_exec` — confirmado que `disable_functions` está vazio no PHP desse host (checado em 10/08/2026), então `shell_exec`/`exec` funcionam normalmente.
+O GitHub Actions faz build do frontend (Vite) e sobe o resultado via FTP direto pro king.host (`deploy-frontend.yml`) — ver issues #85/#86.
 
-Configuração necessária (uma vez só):
-1. Gerar um segredo: `openssl rand -hex 32`.
-2. Colocar esse valor em `DEPLOY_WEBHOOK_SECRET` no `.env` do servidor.
-3. Cadastrar o mesmo valor como secret `DEPLOY_WEBHOOK_SECRET` no GitHub Actions do repositório.
+**Por que FTP e não SSH:** SSH direto do GitHub Actions **nunca funcionou** nesse ambiente — testado múltiplas vezes (inclusive com host/usuário/senha corrigidos em 12/08/2026), sempre falha com timeout de conexão em nível de rede (nem chega a tentar autenticar). O king.host restringe SSH por geografia (só aceitava IP do Brasil por padrão; GitHub Actions roda fora). Em 12/08/2026 confirmamos que **FTP tem a mesma restrição, mas com um toggle simples pra resolver**: Kingpainel → gerenciar FTP → liberar acesso Global (não só Brasil). Com isso ligado, FTP do GitHub Actions passou a funcionar - SSH continua bloqueado independente disso (são mecanismos de bloqueio separados, aparentemente).
 
-Deploy então acontece automaticamente a cada push em `main` — em segundos, sem custo, sem depender de nenhuma máquina externa ligada.
+O workflow builda com `base: '/app/'` (ver `frontend/vite.config.ts`) e sobe `frontend/dist/` via `SamKirkland/FTP-Deploy-Action` pra `~/www/agendatech/app/` — subpasta da mesma webroot do backend, mesma origem (sem CORS/mixed content). Reusa os secrets `SSH_HOST`/`SSH_USER`/`SSH_PASSWORD` (mesma conta, FTP e SSH compartilham login no king.host).
+
+### Backend — ainda em aberto
+
+**Tentativa 1 (descartada): SSH via GitHub Actions.** Testado 3x, sempre `dial tcp ...: i/o timeout` — mesmo bloqueio geográfico do parágrafo acima.
+
+**Tentativa 2 (descartada): gatilho HTTP + shell_exec.** PR #80 implementou uma rota (`POST /api/internal/deploy`) que rodava `deploy_agendatech.sh` via `shell_exec` no PHP. Funcionava a autenticação (segredo compartilhado, header `X-Deploy-Secret`), mas o `shell_exec` em si **falha sempre** — confirmado em 11/08/2026 que o PHP-FPM (web) desse host tem `shell_exec`/`exec`/`proc_open`/etc desabilitados via `disable_functions` (preset de segurança do host contra webshells; a checagem anterior via CLI, que dava vazio, testou o PHP errado - CLI e FPM têm php.ini diferentes). Não tem como contornar isso sem acesso ao php.ini do host, que não temos em hospedagem compartilhada.
+
+**Em avaliação agora:**
+- *Publicação via Git nativa do Kingpainel* — feature própria do painel que cadastra um webhook do GitHub e faz `git pull` sozinho a cada push, sem depender de SSH/FTP/shell_exec (roda do lado do host, fora da nossa sandbox de PHP). Promissora, ainda não configurada de ponta a ponta - ver #31.
+- *Ponte via VM Oracle Cloud (Always Free)* — máquina com IP fixo, autorizada separadamente, que receberia aviso do GitHub Actions e disparia o SSH de verdade (ela tem shell completo, ao contrário do PHP-FPM). Só faz sentido se o Git nativo não for suficiente (ex.: se precisarmos rodar `composer install`/`migrate` como parte do deploy).
 
 **Alternativas avaliadas e descartadas:**
 - *CronJob pago do Kingpainel* (R$7,90/pacote de 20 tarefas) — descoberto que é baseado em URL fixa no domínio principal da conta (`www.devpira.com.br`, não dá pra apontar pro subdomínio do agendatech) e o campo "Minuto" não parece suportar intervalos tipo `*/5`, só um minuto fixo por hora. Não atende.
-- *Watcher rodando numa máquina local* (poll no GitHub + SSH usando o IP já autorizado do desenvolvedor) — funcionaria, mas depende da máquina estar ligada. Descartado em favor do gatilho HTTP, que não depende de nada externo.
+- *Watcher rodando numa máquina local* (poll no GitHub + SSH usando o IP já autorizado do desenvolvedor) — funcionaria, mas depende da máquina estar ligada. Descartado.
 
 ### Rollback
 
