@@ -18,11 +18,13 @@ jobs:
           echo "Teste de conexao FTP via GitHub Actions - $(date -u)" > test-ftp-upload/teste-github-actions.txt
 
       - name: Subir via FTP pra pasta de teste (nao mexe em producao)
+        # Reusa os mesmos secrets do teste de SSH (mesmo host/usuario/senha
+        # da conta king.host) - nao precisa cadastrar FTP_* separado.
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: ${{ secrets.FTP_ADDRESS }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
+          server: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
           local-dir: ./test-ftp-upload/
           server-dir: ./www/agendatech/_teste-ftp-github-actions/
           dangerous-clean-slate: false
