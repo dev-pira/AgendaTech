@@ -1,0 +1,28 @@
+name: Teste SSH (diagnóstico)
+
+# Workflow isolado, só pra confirmar se o GitHub Actions consegue SSH no
+# king.host agora que a restrição geográfica (Brasil x Global) foi
+# liberada no painel (ver issue #31/#79). Não mexe em nada de produção -
+# só conecta e roda um "echo". Disparo manual (workflow_dispatch), sem
+# trigger automático em push.
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  test-ssh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Testar conexão SSH com o king.host
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 \
+            -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" \
+            "$SSH_USER@$SSH_HOST" "echo 'Conectou! Rodando em:' \$(hostname) \$(date)"
