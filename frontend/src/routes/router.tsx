@@ -18,43 +18,51 @@ const CalendarioPage = lazy(() =>
   import('@/pages/calendario/calendario-page').then((m) => ({ default: m.CalendarioPage })),
 );
 
-export const router = createBrowserRouter([
-  {
-    element: <RootLayout />,
-    children: [
-      { index: true, element: <Navigate to="/comunidades" replace /> },
-      { path: 'login', element: <LoginPage /> },
-      { path: 'registro', element: <RegistroPage /> },
+// import.meta.env.BASE_URL reflete o `base` do vite.config.ts ("/app/" em
+// build de produção, "/" no dev server) — ver issue #85. O react-router não
+// quer a barra final no basename.
+const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || '/';
 
-      { path: 'comunidades', element: <ListaComunidadesPage /> },
-      { path: 'comunidades/:id', element: <DetalheComunidadePage /> },
+export const router = createBrowserRouter(
+  [
+    {
+      element: <RootLayout />,
+      children: [
+        { index: true, element: <Navigate to="/comunidades" replace /> },
+        { path: 'login', element: <LoginPage /> },
+        { path: 'registro', element: <RegistroPage /> },
 
-      { path: 'eventos', element: <ListaEventosPage /> },
-      { path: 'eventos/:id', element: <DetalheEventoPage /> },
+        { path: 'comunidades', element: <ListaComunidadesPage /> },
+        { path: 'comunidades/:id', element: <DetalheComunidadePage /> },
 
-      {
-        path: 'calendario',
-        element: (
-          <Suspense
-            fallback={<p className="py-12 text-center text-muted-foreground">Carregando...</p>}
-          >
-            <CalendarioPage />
-          </Suspense>
-        ),
-      },
+        { path: 'eventos', element: <ListaEventosPage /> },
+        { path: 'eventos/:id', element: <DetalheEventoPage /> },
 
-      {
-        element: <ProtectedRoute />,
-        children: [
-          { path: 'comunidades/nova', element: <FormComunidadePage /> },
-          { path: 'comunidades/:id/editar', element: <FormComunidadePage /> },
-          { path: 'comunidades/:id/membros', element: <MembrosComunidadePage /> },
-          { path: 'eventos/novo', element: <FormEventoPage /> },
-          { path: 'eventos/:id/editar', element: <FormEventoPage /> },
-        ],
-      },
+        {
+          path: 'calendario',
+          element: (
+            <Suspense
+              fallback={<p className="py-12 text-center text-muted-foreground">Carregando...</p>}
+            >
+              <CalendarioPage />
+            </Suspense>
+          ),
+        },
 
-      { path: '*', element: <p className="py-12 text-center">Página não encontrada.</p> },
-    ],
-  },
-]);
+        {
+          element: <ProtectedRoute />,
+          children: [
+            { path: 'comunidades/nova', element: <FormComunidadePage /> },
+            { path: 'comunidades/:id/editar', element: <FormComunidadePage /> },
+            { path: 'comunidades/:id/membros', element: <MembrosComunidadePage /> },
+            { path: 'eventos/novo', element: <FormEventoPage /> },
+            { path: 'eventos/:id/editar', element: <FormEventoPage /> },
+          ],
+        },
+
+        { path: '*', element: <p className="py-12 text-center">Página não encontrada.</p> },
+      ],
+    },
+  ],
+  { basename },
+);

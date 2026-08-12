@@ -1,0 +1,24 @@
+# Fallback de rotas do SPA (React Router) quando publicado em /app/ na
+# webroot do king.host — ver issue #85. Sem isso, dar F5 ou acessar
+# diretamente uma rota tipo /app/comunidades/123 retorna 404 do Apache,
+# porque esse caminho não existe como arquivo físico: só o index.html sabe
+# rotear pra ele no lado do cliente.
+#
+# Este arquivo é copiado automaticamente pro dist/ pelo Vite (tudo que está
+# em frontend/public/ vai pra raiz do build) — não precisa ser recriado
+# manualmente no servidor a cada deploy.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /app/
+
+    # Deixa passar arquivos e diretórios que realmente existem (JS, CSS,
+    # imagens, etc.) sem reescrever.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Todo o resto cai no index.html — o React Router decide o que
+    # renderizar a partir da URL.
+    RewriteRule ^ index.html [L]
+</IfModule>
