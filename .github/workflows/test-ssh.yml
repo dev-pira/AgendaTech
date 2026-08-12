@@ -13,16 +13,16 @@ jobs:
   test-ssh:
     runs-on: ubuntu-latest
     steps:
-      - name: Testar conexão SSH com o king.host
+      - name: Instalar sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Testar conexão SSH com o king.host (senha)
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 \
-            -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" \
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 \
+            -p "${SSH_PORT:-22}" \
             "$SSH_USER@$SSH_HOST" "echo 'Conectou! Rodando em:' \$(hostname) \$(date)"

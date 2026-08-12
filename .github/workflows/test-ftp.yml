@@ -1,0 +1,28 @@
+name: Teste FTP (diagnóstico)
+
+# Workflow isolado, só pra confirmar se o GitHub Actions consegue subir
+# arquivo via FTP no king.host agora que o acesso Global foi liberado no
+# painel (ver #31/#85). Sobe um unico arquivo de teste inofensivo pra uma
+# pasta separada (nao mexe em nada de producao). Disparo manual.
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  test-ftp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Criar arquivo de teste
+        run: |
+          mkdir -p test-ftp-upload
+          echo "Teste de conexao FTP via GitHub Actions - $(date -u)" > test-ftp-upload/teste-github-actions.txt
+
+      - name: Subir via FTP pra pasta de teste (nao mexe em producao)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_ADDRESS }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./test-ftp-upload/
+          server-dir: ./www/agendatech/_teste-ftp-github-actions/
+          dangerous-clean-slate: false
