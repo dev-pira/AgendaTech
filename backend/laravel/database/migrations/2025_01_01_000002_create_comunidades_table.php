@@ -21,8 +21,14 @@ return new class extends Migration
         });
 
         // RN-COM-06: nome único, sem diferenciar maiúsculas/minúsculas.
-        if (Schema::getConnection()->getDriverName() === 'sqlite') {
+        $driver = Schema::getConnection()->getDriverName();
+
+        if ($driver === 'sqlite') {
             DB::statement('CREATE UNIQUE INDEX comunidades_nome_ci_unique ON comunidades (nome COLLATE NOCASE)');
+        } elseif ($driver === 'pgsql') {
+            // Postgres não tem collation case-insensitive por padrão (diferente do
+            // MySQL, cuja collation padrão já é *_ci) — índice funcional sobre LOWER().
+            DB::statement('CREATE UNIQUE INDEX comunidades_nome_ci_unique ON comunidades (LOWER(nome))');
         } else {
             Schema::table('comunidades', function (Blueprint $table) {
                 $table->unique('nome', 'comunidades_nome_ci_unique');
