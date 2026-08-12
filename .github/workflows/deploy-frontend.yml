@@ -48,6 +48,9 @@ jobs:
           server: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
-          local-dir: ./dist/
+          # "defaults.run.working-directory: frontend" (acima) só vale pra
+          # steps "run:", não pra steps "uses:" como este - por isso o
+          # caminho aqui precisa do prefixo frontend/ explicito.
+          local-dir: ./frontend/dist/
           server-dir: ./www/agendatech/app/
           dangerous-clean-slate: true
