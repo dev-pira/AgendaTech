@@ -7,9 +7,13 @@ export function registrar(dados: { nome: string; email: string; senha: string })
   return request<AuthResponse>('/auth/registro', { method: 'POST', body: dados, auth: false });
 }
 
-export function login(dados: { email: string; senha: string }) {
+export function login(dados: { username: string; password: string }) {
   if (MOCK_ENABLED) return mock.login(dados);
-  return request<AuthResponse>('/auth/login', { method: 'POST', body: dados, auth: false });
+  // O backend real (App\Http\Controllers\Api\AuthController::obterToken) e
+  // POST /api/auth/token com { username, password } - nao /auth/login com
+  // { email, senha }. Ver issue #93: o contrato anterior aqui era o da
+  // versao Node antiga (backend/src, removida), nunca existiu no Laravel.
+  return request<AuthResponse>('/auth/token', { method: 'POST', body: dados, auth: false });
 }
 
 export function eu() {

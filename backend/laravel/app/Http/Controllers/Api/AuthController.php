@@ -32,6 +32,17 @@ class AuthController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        return response()->json(['token' => JwtService::encode($user)]);
+        // Inclui dados basicos do usuario na propria resposta do login (nao
+        // so o token) - o frontend nao tem outro jeito de saber quem
+        // logou, ja que o JWT so carrega o "sub" (id) e nao existe (ainda)
+        // um endpoint tipo GET /auth/eu pra consultar depois. Ver issue #93.
+        return response()->json([
+            'token' => JwtService::encode($user),
+            'usuario' => [
+                'id' => $user->id,
+                'nome' => trim("{$user->first_name} {$user->last_name}") ?: $user->username,
+                'email' => $user->email,
+            ],
+        ]);
     }
 }

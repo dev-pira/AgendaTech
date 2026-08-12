@@ -5,7 +5,7 @@ import { uuid, usuarios } from './db';
 import { delay } from './utils';
 
 function sanitizar(usuario: (typeof usuarios)[number]): AuthResponse['usuario'] {
-  return { id: usuario.id, nome: usuario.nome, email: usuario.email, criado_em: usuario.criado_em };
+  return { id: usuario.id, nome: usuario.nome, email: usuario.email };
 }
 
 export async function registrar(dados: {
@@ -28,10 +28,13 @@ export async function registrar(dados: {
   return { usuario: sanitizar(usuario), token: usuario.id };
 }
 
-export async function login(dados: { email: string; senha: string }): Promise<AuthResponse> {
+export async function login(dados: { username: string; password: string }): Promise<AuthResponse> {
   await delay();
-  const usuario = usuarios.find((u) => u.email.toLowerCase() === dados.email.toLowerCase());
-  if (!usuario || usuario.senha !== dados.senha) {
+  // Os dados de mock (mocks/db.ts) só têm email, sem username separado -
+  // no modo mock, digite o email de um dos usuários seed no campo
+  // "Usuário" (ver mocks/db.ts pros valores disponíveis).
+  const usuario = usuarios.find((u) => u.email.toLowerCase() === dados.username.toLowerCase());
+  if (!usuario || usuario.senha !== dados.password) {
     throw new HttpError(401, 'Credenciais inválidas [mock]');
   }
   return { usuario: sanitizar(usuario), token: usuario.id };

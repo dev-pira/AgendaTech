@@ -12,7 +12,7 @@ export function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [email, setEmail] = useState('');
+  const [usuario, setUsuarioInput] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
@@ -24,7 +24,7 @@ export function LoginPage() {
     setErro(null);
     setEnviando(true);
     try {
-      await login(email, senha);
+      await login(usuario, senha);
       navigate(destino, { replace: true });
     } catch (err) {
       setErro(err instanceof HttpError ? err.message : 'Não foi possível entrar');
@@ -43,13 +43,16 @@ export function LoginPage() {
         <CardContent>
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="email">E-mail</Label>
+              {/* Login e por username, nao email - sao colunas distintas
+                  na tabela users (ver issue #93). type="text" porque um
+                  username nem sempre tem formato de e-mail. */}
+              <Label htmlFor="usuario">Usuário</Label>
               <Input
-                id="email"
-                type="email"
+                id="usuario"
+                type="text"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={usuario}
+                onChange={(e) => setUsuarioInput(e.target.value)}
               />
             </div>
             <div className="flex flex-col gap-2">
