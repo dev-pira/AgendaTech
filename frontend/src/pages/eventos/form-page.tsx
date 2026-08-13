@@ -105,22 +105,32 @@ export function FormEventoPage() {
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-2">
               <Label htmlFor="comunidade">Comunidade</Label>
-              <Select
-                value={form.comunidade_id}
-                onValueChange={(v) => atualizarCampo('comunidade_id', v)}
-                disabled={editando}
-              >
-                <SelectTrigger id="comunidade">
-                  <SelectValue placeholder="Selecione a comunidade" />
-                </SelectTrigger>
-                <SelectContent>
-                  {comunidades.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {editando ? (
+                // Campo nunca e editavel apos criado (comunidade_id nao
+                // muda), entao mostra so o nome em vez de um Select
+                // desabilitado - um <Select disabled> com Radix nao
+                // renderiza o item selecionado, aparecia em branco pro
+                // usuario mesmo com o valor certo por baixo (issue #104).
+                <p id="comunidade" className="flex h-9 items-center text-sm">
+                  {comunidades.find((c) => c.id === form.comunidade_id)?.nome ?? '—'}
+                </p>
+              ) : (
+                <Select
+                  value={form.comunidade_id}
+                  onValueChange={(v) => atualizarCampo('comunidade_id', v)}
+                >
+                  <SelectTrigger id="comunidade">
+                    <SelectValue placeholder="Selecione a comunidade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {comunidades.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             <div className="flex flex-col gap-2">
