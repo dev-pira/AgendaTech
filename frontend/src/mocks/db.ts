@@ -51,7 +51,7 @@ export const comunidades: Comunidade[] = [
     logo_url: null,
     criado_em: '2026-01-15T10:00:00Z',
     atualizado_em: '2026-01-15T10:00:00Z',
-    criado_por: 'usr-organizador-devlimeira',
+    criado_por: { id: 'usr-organizador-devlimeira', nome: 'Organizador DevLimeira' },
     total_membros: 2,
   },
   {
@@ -64,7 +64,7 @@ export const comunidades: Comunidade[] = [
     logo_url: null,
     criado_em: '2026-02-01T09:00:00Z',
     atualizado_em: '2026-02-01T09:00:00Z',
-    criado_por: 'usr-organizador-devitape',
+    criado_por: { id: 'usr-organizador-devitape', nome: 'Organizadora DevItape' },
     total_membros: 1,
   },
 ];

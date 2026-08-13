@@ -8,8 +8,19 @@ function Select({ ...props }: React.ComponentProps<typeof SelectPrimitive.Root>)
   return <SelectPrimitive.Root data-slot="select" {...props} />;
 }
 
-function SelectValue({ ...props }: React.ComponentProps<typeof SelectPrimitive.Value>) {
-  return <SelectPrimitive.Value data-slot="select-value" {...props} />;
+function SelectValue({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Value>) {
+  // min-w-0 e necessario pro truncate funcionar aqui: SelectValue e filho
+  // de um flex container (SelectTrigger), e flex item por padrao tem
+  // min-width:auto (nao encolhe abaixo do conteudo) - sem isso o overflow
+  // nunca dispara e o valor longo estoura a largura fixa do trigger.
+  // Ver issue #100.
+  return (
+    <SelectPrimitive.Value
+      data-slot="select-value"
+      className={cn('min-w-0 truncate', className)}
+      {...props}
+    />
+  );
 }
 
 function SelectTrigger({

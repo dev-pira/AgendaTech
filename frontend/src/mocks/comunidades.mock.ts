@@ -56,7 +56,7 @@ export async function criarComunidade(dados: ComunidadeInput): Promise<Comunidad
     logo_url: dados.logo_url ?? null,
     criado_em: agora,
     atualizado_em: agora,
-    criado_por: usuario.id,
+    criado_por: { id: usuario.id, nome: usuario.nome },
   };
   comunidades.push(comunidade);
   // RN-COM-08: criador é auto-atribuído como organizador
@@ -80,7 +80,7 @@ export async function atualizarComunidade(
   const comunidade = comunidades.find((c) => c.id === id);
   if (!comunidade) throw new HttpError(404, 'Comunidade não encontrada [mock]');
   // RN-COM-07: só o criador pode editar
-  if (comunidade.criado_por !== usuario.id) {
+  if (comunidade.criado_por?.id !== usuario.id) {
     throw new HttpError(403, 'Apenas o criador da comunidade pode editá-la [mock]');
   }
   Object.assign(comunidade, dados, { atualizado_em: new Date().toISOString() });
@@ -93,7 +93,7 @@ export async function excluirComunidade(id: string): Promise<void> {
   const indice = comunidades.findIndex((c) => c.id === id);
   if (indice === -1) throw new HttpError(404, 'Comunidade não encontrada [mock]');
   const comunidade = comunidades[indice];
-  if (comunidade.criado_por !== usuario.id) {
+  if (comunidade.criado_por?.id !== usuario.id) {
     throw new HttpError(403, 'Apenas o criador da comunidade pode excluí-la [mock]');
   }
   const hoje = new Date().toISOString().slice(0, 10);

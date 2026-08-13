@@ -67,7 +67,10 @@ export function DetalheComunidadePage() {
     return <p className="text-destructive">{erro ?? 'Comunidade não encontrada'}</p>;
   }
 
-  const ehCriador = usuario?.id === comunidade.criado_por;
+  // criado_por e objeto ({id, nome}), nao string - ver issue #99. Comparar
+  // com .criado_por direto (sem .id) nunca dava match, escondendo os
+  // botoes de Editar/Excluir ate do dono de verdade da comunidade.
+  const ehCriador = usuario?.id === comunidade.criado_por?.id;
 
   return (
     <div className="flex flex-col gap-6">

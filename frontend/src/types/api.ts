@@ -26,6 +26,13 @@ export interface UsuarioResumo {
   email: string;
 }
 
+// Retorno de UsuarioResumoResource::toArray no backend - so id/nome (sem
+// email, ao contrario de UsuarioResumo). Usado em Comunidade.criado_por.
+export interface CriadorResumo {
+  id: string;
+  nome: string;
+}
+
 export interface Comunidade {
   id: string;
   nome: string;
@@ -34,8 +41,11 @@ export interface Comunidade {
   contato: string;
   logo_url: string | null;
   criado_em: string;
-  atualizado_em: string;
-  criado_por: string;
+  // atualizado_em e criado_por so vem em ComunidadeDetailResource (GET
+  // /comunidades/{id}) - ComunidadeResource (listagem) nao inclui nenhum
+  // dos dois. Opcionais aqui pra refletir isso - ver issue #99.
+  atualizado_em?: string;
+  criado_por?: CriadorResumo;
   total_membros?: number;
 }
 
