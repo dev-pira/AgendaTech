@@ -5,11 +5,13 @@ on:
     branches: [main]
     paths:
       - 'backend/laravel/**'
+      - 'frontend/**'
       - '.github/workflows/ci.yml'
   pull_request:
     branches: [main]
     paths:
       - 'backend/laravel/**'
+      - 'frontend/**'
       - '.github/workflows/ci.yml'
 
 jobs:
@@ -29,7 +31,8 @@ jobs:
         with:
           php-version: '8.2'
           tools: composer:v2
-          coverage: none
+          # pcov habilitado - ver issue #30 (relatório de cobertura no CI).
+          coverage: pcov
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
@@ -50,8 +53,44 @@ jobs:
       - name: Verificar estilo de código (Pint)
         run: vendor/bin/pint --test
 
-      - name: Rodar testes (PHPUnit, SQLite em memória)
-        run: php artisan test
+      - name: Rodar testes (PHPUnit, SQLite em memória, com cobertura)
+        run: php artisan test --coverage
 
-  # Frontend job entra aqui quando a issue 4.1 (Setup Projeto Frontend) for concluída.
-  # Por enquanto frontend/ está vazio (só .gitkeep), não há o que buildar/testar ainda.
+  frontend:
+    name: Frontend (React)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          # >=22.12 - vite 8/vitest 4 usam require(esm) internamente
+          # (jsdom, rolldown); versões mais antigas do Node quebram isso.
+          node-version: '22.14'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint (ESLint)
+        run: npm run lint
+
+      # format:check NÃO entra aqui de propósito por ora: o restante do
+      # código (~60 arquivos pré-existentes) tem drift de formatação nunca
+      # verificado por CI antes - rodar isso bloqueando agora quebraria o
+      # CI pra qualquer PR até alguém rodar `npm run format` no repo
+      # inteiro. Ver issue #32 (a config do Prettier em si já está feita
+      # e correta - isso aqui é só sobre ligar a checagem automática).
+
+      - name: Testes unitários (Vitest, com cobertura)
+        run: npm run test:coverage
+
+      - name: Build (verifica tsc + vite build)
+        run: npm run build
