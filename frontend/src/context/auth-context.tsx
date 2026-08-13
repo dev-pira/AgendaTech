@@ -2,7 +2,7 @@ import { createContext, useCallback, useState, type ReactNode } from 'react';
 
 import * as authService from '@/services/auth';
 import { getToken, getUsuario, setToken, setUsuario as persistUsuario } from '@/services/http';
-import type { AuthResponse } from '@/types/api';
+import type { AuthResponse, CadastroInput } from '@/types/api';
 
 type Usuario = AuthResponse['usuario'];
 
@@ -10,7 +10,7 @@ interface AuthContextValue {
   usuario: Usuario | null;
   carregando: boolean;
   login: (usuario: string, senha: string) => Promise<void>;
-  registrar: (nome: string, email: string, senha: string) => Promise<void>;
+  registrar: (dados: CadastroInput) => Promise<void>;
   logout: () => void;
 }
 
@@ -32,9 +32,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUsuario(resposta.usuario);
   }, []);
 
-  const registrar = useCallback(async (nome: string, email: string, senha: string) => {
-    const resposta = await authService.registrar({ nome, email, senha });
+  const registrar = useCallback(async (dados: CadastroInput) => {
+    const resposta = await authService.registrar(dados);
     setToken(resposta.token);
+    // persistUsuario() faltava aqui (só login() chamava) - sem isso o
+    // usuário sumia do header depois de um F5 logo após se cadastrar.
+    persistUsuario(resposta.usuario);
     setUsuario(resposta.usuario);
   }, []);
 

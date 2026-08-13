@@ -113,9 +113,21 @@ export interface CalendarioResponse {
 export interface AuthResponse {
   // Corrigido pra bater com o retorno real de
   // App\Http\Controllers\Api\AuthController::obterToken (ver issue #93) -
-  // o backend Laravel nao tem criado_em nessa resposta.
+  // o backend Laravel nao tem criado_em nessa resposta. POST /cadastro
+  // (issue #73) devolve o mesmo formato (loga o usuario automaticamente).
   usuario: UsuarioResumo;
   token: string;
+}
+
+// Bate com CadastroRequest (backend) - ver issue #73. password_confirmation
+// e exigido pela regra 'confirmed' do Laravel (compara com password).
+export interface CadastroInput {
+  username: string;
+  email: string;
+  first_name: string;
+  last_name?: string;
+  password: string;
+  password_confirmation: string;
 }
 
 export interface ApiErrorBody {
