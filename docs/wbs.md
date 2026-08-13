@@ -40,8 +40,8 @@ graph TD
     WBS2 --> T2E[2.5 Documentação API]
 
     WBS3 --> T3A[3.1 Setup GitHub Actions]
-    WBS3 --> T3B[3.2 Pipeline de Testes]
-    WBS3 --> T3C[3.3 Pipeline de Deploy]
+    WBS3 --> T3B[3.2 Pipeline de STG (Testes)]
+    WBS3 --> T3C[3.3 Pipeline de PRD (Produção)]
     WBS3 --> T3D[3.4 Linting e Formatação]
 
     WBS4 --> T4A[4.1 Setup Projeto Frontend]
@@ -178,8 +178,8 @@ MS1 (DEVPIRA) ──┬──→ MS2 (DevLimeira) ──┐
 | # | Issue | Estimativa | Prioridade |
 |---|-------|-----------|------------|
 | 3.1 | Setup GitHub Actions (workflows base, triggers, runner) | 3 pontos | Alta |
-| 3.2 | Pipeline de Testes (testes unitários no CI, cobertura, check obrigatório) | 5 pontos | Média |
-| 3.3 | Pipeline de Deploy (deploy automatizado, staging, notificações) | 5 pontos | Baixa |
+| 3.2 | Pipeline de STG (Testes) — testes unitários no CI, cobertura, check obrigatório | 5 pontos | Média |
+| 3.3 | Pipeline de PRD (Produção) — deploy automatizado, staging, notificações | 5 pontos | Baixa |
 | 3.4 | Linting e Formatação (Laravel Pint, PHPStan, checks no CI) | 3 pontos | Média |
 
 **Critérios de conclusão:**
@@ -447,8 +447,8 @@ MS1 (DEVPIRA) ──┬──→ MS2 (DevLimeira) ──┐
 | # | Tarefa | Entregável | Critério de Conclusão | Dependências | Estimativa |
 |---|--------|------------|----------------------|--------------|------------|
 | 3.1 | Setup GitHub Actions | Workflows base configurados | Arquivo `.github/workflows/` com workflow de CI ativado em push e pull_request para main; jobs executando com sucesso em runner Ubuntu; estrutura de steps definida | MS1 concluído; estrutura do repositório definida | 3 pontos |
-| 3.2 | Pipeline de Testes | Pipeline de testes automatizados | Testes unitários executando no CI em cada PR; relatório de cobertura gerado; check de testes como obrigatório para merge; testes do backend e frontend executando | 3.1 Setup GitHub Actions, 2.2 CRUD Comunidades | 5 pontos |
-| 3.3 | Pipeline de Deploy | Pipeline de deploy configurado | Workflow de deploy ativado em merge na main; deploy automatizado para ambiente de staging/preview; notificação de status de deploy | 3.1 Setup GitHub Actions, 3.2 Pipeline de Testes | 5 pontos |
+| 3.2 | Pipeline de STG (Testes) | Pipeline de testes automatizados | Testes unitários executando no CI em cada PR; relatório de cobertura gerado; check de testes como obrigatório para merge; testes do backend e frontend executando | 3.1 Setup GitHub Actions, 2.2 CRUD Comunidades | 5 pontos |
+| 3.3 | Pipeline de PRD (Produção) | Pipeline de deploy configurado | Workflow de deploy ativado em merge na main; deploy automatizado para ambiente de staging/preview; notificação de status de deploy | 3.1 Setup GitHub Actions, 3.2 Pipeline de STG (Testes) | 5 pontos |
 | 3.4 | Linting e Formatação | Checks de linting e formatação no CI | ESLint configurado para frontend; linter configurado para backend; Prettier para formatação; checks bloqueiam merge se falham; configuração compartilhada entre local e CI | 3.1 Setup GitHub Actions | 3 pontos |
 
 ### Detalhamento das Tarefas DevRioClaro
@@ -464,7 +464,7 @@ MS1 (DEVPIRA) ──┬──→ MS2 (DevLimeira) ──┐
   - [ ] Workflow executando com sucesso (green check)
 - **Dependências:** MS1 concluído, estrutura do repositório definida
 
-#### 3.2 Pipeline de Testes
+#### 3.2 Pipeline de STG (Testes)
 
 - **Entregável:** Pipeline de testes automatizados integrado ao CI
 - **Critério de Conclusão:**
@@ -475,7 +475,7 @@ MS1 (DEVPIRA) ──┬──→ MS2 (DevLimeira) ──┐
   - [ ] Falha de teste bloqueia merge do PR
 - **Dependências:** 3.1 Setup GitHub Actions, 2.2 CRUD Comunidades (necessita código para testar)
 
-#### 3.3 Pipeline de Deploy
+#### 3.3 Pipeline de PRD (Produção)
 
 - **Entregável:** Workflow de deploy automatizado
 - **Critério de Conclusão:**
@@ -484,7 +484,7 @@ MS1 (DEVPIRA) ──┬──→ MS2 (DevLimeira) ──┐
   - [ ] Deploy para ambiente de staging/preview configurado
   - [ ] Notificação de status (sucesso/falha) via GitHub commit status ou comment
   - [ ] Rollback documentado em caso de falha
-- **Dependências:** 3.1 Setup GitHub Actions, 3.2 Pipeline de Testes
+- **Dependências:** 3.1 Setup GitHub Actions, 3.2 Pipeline de STG (Testes)
 
 #### 3.4 Linting e Formatação
 
@@ -599,7 +599,7 @@ graph TD
 
     subgraph "DevRioClaro (MS3)"
         T3A[3.1 Setup GitHub Actions]
-        T3B[3.2 Pipeline de Testes]
+        T3B[3.2 Pipeline de STG (Testes)]
     end
 
     subgraph "DevItape (MS4)"
@@ -637,7 +637,7 @@ graph TD
 |-------------------|-----------|------------|----------------------|---------------------|
 | 2.1 Modelagem de Dados | DevLimeira | 1.8 Escopo Funcional | DEVPIRA | Especificação (modelo de dados definido) |
 | 3.1 Setup GitHub Actions | DevRioClaro | 1.2 Setup Repositório | DEVPIRA | Estrutura (repositório precisa existir) |
-| 3.2 Pipeline de Testes | DevRioClaro | 2.2 CRUD Comunidades | DevLimeira | Código (precisa de código para testar) |
+| 3.2 Pipeline de STG (Testes) | DevRioClaro | 2.2 CRUD Comunidades | DevLimeira | Código (precisa de código para testar) |
 | 4.1 Setup Frontend | DevItape | 1.1 Definição de Stack | DEVPIRA | Especificação (framework definido) |
 | 4.2 Tela Listagem | DevItape | 2.2 CRUD Comunidades | DevLimeira | Contrato de API (formato de resposta) |
 | 4.3 Formulários | DevItape | 2.2, 2.3 CRUD | DevLimeira | Contrato de API (endpoints definidos) |
@@ -704,8 +704,8 @@ gantt
     section DevRioClaro
     Setup GitHub Actions     :t3a, after t1b, 1d
     Linting e Formatação     :t3d, after t3a, 1d
-    Pipeline de Testes       :t3b, after t2b, 1d
-    Pipeline de Deploy       :t3c, after t3b, 1d
+    Pipeline de STG (Testes)       :t3b, after t2b, 1d
+    Pipeline de PRD (Produção)       :t3c, after t3b, 1d
 
     section DevItape
     Setup Projeto Frontend   :t4a, after t3a, 1d
