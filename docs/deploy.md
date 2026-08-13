@@ -49,6 +49,11 @@ Senha só existe no `.env` do servidor, nunca versionada. Driver `pdo_pgsql` con
 - Clone privado do repo em `~/apps/agendatech`, **fora do webroot** — protege `.env`/`vendor`/código-fonte de acesso via URL.
 - Só o conteúdo de `backend/laravel/public/` é publicado em `~/www/agendatech` (webroot real).
 - `index.php` tem os caminhos de `vendor`/`bootstrap`/`maintenance` reescritos via `sed` a cada deploy, apontando pro clone privado.
+- `~/www/agendatech/app/` é o **frontend React**, publicado separadamente via FTP (ver seção abaixo) — mora na mesma webroot do backend, mas não é gerenciado pelo `deploy_agendatech.sh`.
+
+### ⚠️ Pegadinha: deploy do backend apaga o frontend se o script não souber da pasta `app/`
+
+O `deploy_agendatech.sh` (versionado em `infra/deploy_agendatech.sh` a partir de 13/08/2026, mas a cópia que roda de verdade é a do `$HOME` do servidor) limpa a webroot antes de publicar o `public/` novo do Laravel. Até 12/08/2026 essa limpeza só tinha exceção pra `.well-known` e `erros` — não sabia que existia `app/` (frontend), e apagava ele a cada deploy de backend. Corrigido adicionando `app` à lista de exceções. **Se recriar esse script do zero ou reverter pra uma cópia antiga, lembre de incluir essa exceção.**
 
 ## Deploy automático
 
