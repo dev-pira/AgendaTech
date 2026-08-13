@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Support\Auditavel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class ComunidadeMembro extends Pivot
 {
+    use Auditavel;
+
     public const ORGANIZADOR = 'organizador';
 
     public const MEMBRO = 'membro';

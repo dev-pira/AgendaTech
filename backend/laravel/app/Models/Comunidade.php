@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Auditavel;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,7 +19,7 @@ use Illuminate\Validation\ValidationException;
  */
 class Comunidade extends Model
 {
-    use HasFactory, HasUuids;
+    use Auditavel, HasFactory, HasUuids;
 
     public const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'svg', 'webp'];
 
