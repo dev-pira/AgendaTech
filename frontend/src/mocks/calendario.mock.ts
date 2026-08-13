@@ -18,7 +18,8 @@ export async function buscarCalendario(params: FiltrosCalendarioMock): Promise<C
     .filter((e) => !params.comunidade_id || e.comunidade_id === params.comunidade_id)
     .filter((e) => !params.tipo || e.tipo === params.tipo)
     .filter(
-      (e) => !params.cidade || e.comunidade?.cidade.toLowerCase() === params.cidade.toLowerCase(),
+      (e) =>
+        !params.cidade || (e.comunidade.cidade ?? '').toLowerCase() === params.cidade.toLowerCase(),
     );
 
   return {

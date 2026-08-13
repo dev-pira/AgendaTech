@@ -33,6 +33,16 @@ export interface CriadorResumo {
   nome: string;
 }
 
+// Retorno de MembroResource::toArray - membro dentro de Comunidade.membros
+// (so vem em ComunidadeDetailResource). Nao confundir com o tipo Membro
+// abaixo, que e o retorno de GET /comunidades/{id}/membros (formato
+// diferente, aninha em "usuario").
+export interface MembroResumo {
+  usuario_id: string;
+  nome: string;
+  papel: PapelMembro;
+}
+
 export interface Comunidade {
   id: string;
   nome: string;
@@ -41,11 +51,12 @@ export interface Comunidade {
   contato: string;
   logo_url: string | null;
   criado_em: string;
-  // atualizado_em e criado_por so vem em ComunidadeDetailResource (GET
-  // /comunidades/{id}) - ComunidadeResource (listagem) nao inclui nenhum
-  // dos dois. Opcionais aqui pra refletir isso - ver issue #99.
+  // atualizado_em, criado_por e membros so vem em ComunidadeDetailResource
+  // (GET /comunidades/{id}) - ComunidadeResource (listagem) nao inclui
+  // nenhum dos tres. Opcionais aqui pra refletir isso - ver issue #99.
   atualizado_em?: string;
   criado_por?: CriadorResumo;
+  membros?: MembroResumo[];
   total_membros?: number;
 }
 
@@ -66,16 +77,28 @@ export interface ComunidadeEvento {
   hora_fim: string | null;
   local: string;
   tipo: TipoEvento;
-  url_online: string | null;
-  comunidade_id: string;
-  organizador_id: string;
-  criado_em: string;
-  atualizado_em: string;
-  comunidade?: {
+  // comunidade e organizador vem sempre aninhados (EventoResource /
+  // EventoDetailResource) - nao existe comunidade_id/organizador_id como
+  // campo solto na resposta real da API. cidade so vem no detail
+  // (EventoDetailResource usa ComunidadeResumoComCidadeResource).
+  comunidade: {
     id: string;
     nome: string;
-    cidade: string;
+    cidade?: string;
   };
+  organizador: CriadorResumo;
+  // url_online, criado_em e atualizado_em so vem em EventoDetailResource
+  // (GET /eventos/{id}) - EventoResource (listagem) nao inclui nenhum.
+  url_online?: string | null;
+  criado_em?: string;
+  atualizado_em?: string;
+  // Campos legados usados so internamente pelo modo mock (mocks/db.ts) -
+  // nao existem no contrato real da API, nao usar em codigo novo. Ver
+  // issue #92 (achado comparando com o Blade: form-page.tsx usava
+  // evento.comunidade_id pra preencher o form de edicao, que e sempre
+  // undefined vindo da API real - usar evento.comunidade.id).
+  comunidade_id?: string;
+  organizador_id?: string;
 }
 
 export type Evento = ComunidadeEvento;

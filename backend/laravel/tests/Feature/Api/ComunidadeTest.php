@@ -35,6 +35,21 @@ class ComunidadeTest extends TestCase
         $this->assertEquals('DevLimeira', $response->json('dados.0.nome'));
     }
 
+    public function test_listar_filtra_por_busca_no_nome_case_insensitive_e_parcial(): void
+    {
+        // Issue #92: a view Blade tinha esse filtro desde sempre, nunca
+        // foi portado pra API - React ficava filtrando so a pagina atual
+        // (nao o banco inteiro). Achado comparando as duas telas.
+        $organizador = $this->makeUser();
+        $this->makeComunidade($organizador, ['nome' => 'DEVPIRA']);
+        $this->makeComunidade($organizador, ['nome' => 'DevLimeira']);
+        $this->makeComunidade($organizador, ['nome' => 'AWS User Group']);
+
+        $response = $this->getJson('/api/comunidades?busca=dev');
+
+        $this->assertCount(2, $response->json('dados'));
+    }
+
     public function test_listar_pagina_negativa_retorna_400(): void
     {
         $response = $this->getJson('/api/comunidades?pagina=-1');

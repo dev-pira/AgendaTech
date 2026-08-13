@@ -23,6 +23,15 @@ class ComunidadeController extends Controller
     {
         $query = Comunidade::query()->withCount('membros');
 
+        // Issue #92: a busca por nome existia na view Blade
+        // (ComunidadeController::index web) desde sempre, mas nunca foi
+        // portada pra API - o frontend React ficou filtrando so a pagina
+        // atual (10-20 itens) em vez do banco inteiro. Achado no
+        // regressivo comparando as duas telas lado a lado.
+        if ($busca = $request->query('busca')) {
+            $query->whereRaw('LOWER(nome) LIKE ?', ['%'.mb_strtolower($busca).'%']);
+        }
+
         if ($cidade = $request->query('cidade')) {
             $query->whereRaw('LOWER(cidade) = ?', [mb_strtolower($cidade)]);
         }

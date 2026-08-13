@@ -16,11 +16,34 @@ function contarMembros(comunidadeId: string) {
   return membros.filter((m) => m.comunidade_id === comunidadeId).length;
 }
 
+// Mesma regra do backend real (App\Support\Permissions::isOrganizador) -
+// qualquer organizador pode editar/excluir, nao so quem criou. Ver issue
+// #92: antes o mock (e o front) so checavam o criador original.
+function ehOrganizador(comunidadeId: string, usuarioId: string) {
+  return membros.some(
+    (m) => m.comunidade_id === comunidadeId && m.usuario_id === usuarioId && m.papel === 'organizador',
+  );
+}
+
 function serializar(comunidade: Comunidade): Comunidade {
   return { ...comunidade, total_membros: contarMembros(comunidade.id) };
 }
 
+// GET /comunidades/{id} (e store/update) devolvem ComunidadeDetailResource
+// no backend real - inclui membros (usado pro frontend saber se o usuario
+// logado e organizador, ver issue #92). Listagem (ComunidadeResource) NAO
+// inclui - so a serializar() acima, sem membros.
+function serializarDetalhe(comunidade: Comunidade): Comunidade {
+  return {
+    ...serializar(comunidade),
+    membros: membros
+      .filter((m) => m.comunidade_id === comunidade.id)
+      .map((m) => ({ usuario_id: m.usuario_id, nome: m.usuario?.nome ?? '', papel: m.papel })),
+  };
+}
+
 export async function listarComunidades(params: {
+  busca?: string;
   cidade?: string;
   pagina?: number;
   limite?: number;
@@ -28,6 +51,7 @@ export async function listarComunidades(params: {
   await delay();
   const filtradas = comunidades
     .filter((c) => !params.cidade || c.cidade.toLowerCase() === params.cidade.toLowerCase())
+    .filter((c) => !params.busca || c.nome.toLowerCase().includes(params.busca.toLowerCase()))
     .map(serializar)
     .sort((a, b) => b.criado_em.localeCompare(a.criado_em));
   return paginar(filtradas, params.pagina, params.limite);
@@ -37,7 +61,7 @@ export async function buscarComunidade(id: string): Promise<Comunidade> {
   await delay();
   const comunidade = comunidades.find((c) => c.id === id);
   if (!comunidade) throw new HttpError(404, 'Comunidade não encontrada [mock]');
-  return serializar(comunidade);
+  return serializarDetalhe(comunidade);
 }
 
 export async function criarComunidade(dados: ComunidadeInput): Promise<Comunidade> {
@@ -68,7 +92,7 @@ export async function criarComunidade(dados: ComunidadeInput): Promise<Comunidad
     adicionado_por: usuario.id,
     usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email },
   });
-  return serializar(comunidade);
+  return serializarDetalhe(comunidade);
 }
 
 export async function atualizarComunidade(
@@ -79,12 +103,12 @@ export async function atualizarComunidade(
   const usuario = exigirAutenticacao();
   const comunidade = comunidades.find((c) => c.id === id);
   if (!comunidade) throw new HttpError(404, 'Comunidade não encontrada [mock]');
-  // RN-COM-07: só o criador pode editar
-  if (comunidade.criado_por?.id !== usuario.id) {
-    throw new HttpError(403, 'Apenas o criador da comunidade pode editá-la [mock]');
+  // RN-COM-07: qualquer organizador pode editar (nao so o criador original)
+  if (!ehOrganizador(comunidade.id, usuario.id)) {
+    throw new HttpError(403, 'Apenas organizadores podem editar esta comunidade [mock]');
   }
   Object.assign(comunidade, dados, { atualizado_em: new Date().toISOString() });
-  return serializar(comunidade);
+  return serializarDetalhe(comunidade);
 }
 
 export async function excluirComunidade(id: string): Promise<void> {
@@ -93,8 +117,8 @@ export async function excluirComunidade(id: string): Promise<void> {
   const indice = comunidades.findIndex((c) => c.id === id);
   if (indice === -1) throw new HttpError(404, 'Comunidade não encontrada [mock]');
   const comunidade = comunidades[indice];
-  if (comunidade.criado_por?.id !== usuario.id) {
-    throw new HttpError(403, 'Apenas o criador da comunidade pode excluí-la [mock]');
+  if (!ehOrganizador(comunidade.id, usuario.id)) {
+    throw new HttpError(403, 'Apenas organizadores podem excluir esta comunidade [mock]');
   }
   const hoje = new Date().toISOString().slice(0, 10);
   // RN-COM-10: não pode excluir com eventos futuros agendados
