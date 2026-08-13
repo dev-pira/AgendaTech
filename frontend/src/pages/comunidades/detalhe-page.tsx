@@ -67,10 +67,15 @@ export function DetalheComunidadePage() {
     return <p className="text-destructive">{erro ?? 'Comunidade não encontrada'}</p>;
   }
 
-  // criado_por e objeto ({id, nome}), nao string - ver issue #99. Comparar
-  // com .criado_por direto (sem .id) nunca dava match, escondendo os
-  // botoes de Editar/Excluir ate do dono de verdade da comunidade.
-  const ehCriador = usuario?.id === comunidade.criado_por?.id;
+  // A regra real (App\Support\Permissions::isOrganizador, aplicada em
+  // Api/ComunidadeController::update/destroy) e "qualquer organizador",
+  // nao "quem criou" - um organizador promovido depois via gestao de
+  // membros tambem pode editar/excluir. Comparar com criado_por (como
+  // era antes, ver issue #99) escondia os botoes desses organizadores.
+  // Achado comparando com a tela Blade (comunidades.show, $podeGerenciar)
+  // no regressivo #92.
+  const souOrganizador =
+    !!usuario && !!comunidade.membros?.some((m) => m.usuario_id === usuario.id && m.papel === 'organizador');
 
   return (
     <div className="flex flex-col gap-6">
@@ -85,7 +90,7 @@ export function DetalheComunidadePage() {
         </div>
         <div className="flex gap-2">
           <ShareButton title={comunidade.nome} text={`${comunidade.nome} — Agenda Tech`} />
-          {ehCriador && (
+          {souOrganizador && (
             <>
               <Button variant="outline" asChild>
                 <Link to={`/comunidades/${comunidade.id}/editar`}>Editar</Link>

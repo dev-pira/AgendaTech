@@ -124,6 +124,7 @@ export const eventos: Evento[] = [
     criado_em: '2026-07-20T10:00:00Z',
     atualizado_em: '2026-07-20T10:00:00Z',
     comunidade: { id: 'com-devlimeira', nome: 'DevLimeira', cidade: 'Limeira' },
+    organizador: { id: 'usr-organizador-devlimeira', nome: 'Organizador DevLimeira' },
   },
   {
     id: 'evt-workshop-node',
@@ -140,6 +141,7 @@ export const eventos: Evento[] = [
     criado_em: '2026-07-22T10:00:00Z',
     atualizado_em: '2026-07-22T10:00:00Z',
     comunidade: { id: 'com-devlimeira', nome: 'DevLimeira', cidade: 'Limeira' },
+    organizador: { id: 'usr-organizador-devlimeira', nome: 'Organizador DevLimeira' },
   },
   {
     id: 'evt-design-systems',
@@ -157,6 +159,7 @@ export const eventos: Evento[] = [
     criado_em: '2026-07-25T10:00:00Z',
     atualizado_em: '2026-07-25T10:00:00Z',
     comunidade: { id: 'com-devitape', nome: 'DevItape', cidade: 'Itapetininga' },
+    organizador: { id: 'usr-organizador-devitape', nome: 'Organizadora DevItape' },
   },
   {
     id: 'evt-coding-dojo',
@@ -173,5 +176,6 @@ export const eventos: Evento[] = [
     criado_em: '2026-07-28T10:00:00Z',
     atualizado_em: '2026-07-28T10:00:00Z',
     comunidade: { id: 'com-devlimeira', nome: 'DevLimeira', cidade: 'Limeira' },
+    organizador: { id: 'usr-organizador-devlimeira', nome: 'Organizador DevLimeira' },
   },
 ];

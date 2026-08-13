@@ -31,7 +31,9 @@ export async function listarEventos(
     .filter((e) => !filtros.comunidade_id || e.comunidade_id === filtros.comunidade_id)
     .filter((e) => !filtros.tipo || e.tipo === filtros.tipo)
     .filter(
-      (e) => !filtros.cidade || e.comunidade?.cidade.toLowerCase() === filtros.cidade.toLowerCase(),
+      (e) =>
+        !filtros.cidade ||
+        (e.comunidade.cidade ?? '').toLowerCase() === filtros.cidade.toLowerCase(),
     )
     .filter((e) => !filtros.data_inicio || e.data >= filtros.data_inicio)
     .filter((e) => !filtros.data_fim || e.data <= filtros.data_fim)
@@ -87,6 +89,7 @@ export async function criarEvento(dados: EventoInput): Promise<Evento> {
     criado_em: agora,
     atualizado_em: agora,
     comunidade: { id: comunidade.id, nome: comunidade.nome, cidade: comunidade.cidade },
+    organizador: { id: usuario.id, nome: usuario.nome },
   };
   eventos.push(evento);
   return evento;
@@ -105,7 +108,7 @@ export async function atualizarEvento(id: string, dados: Partial<EventoInput>): 
   const evento = eventos.find((e) => e.id === id);
   if (!evento) throw new HttpError(404, 'Evento não encontrado [mock]');
 
-  exigirOrganizadorDaComunidade(evento.comunidade_id, usuario.id, 'editar');
+  exigirOrganizadorDaComunidade(evento.comunidade.id, usuario.id, 'editar');
 
   // RN-EVT-10: eventos passados não podem ser editados
   if (evento.data < hojeYMD()) {
@@ -133,7 +136,7 @@ export async function excluirEvento(id: string): Promise<void> {
   if (indice === -1) throw new HttpError(404, 'Evento não encontrado [mock]');
   const evento = eventos[indice];
 
-  exigirOrganizadorDaComunidade(evento.comunidade_id, usuario.id, 'excluir');
+  exigirOrganizadorDaComunidade(evento.comunidade.id, usuario.id, 'excluir');
 
   if (evento.data < hojeYMD()) {
     throw new HttpError(422, 'Eventos passados não podem ser excluídos [mock]');

@@ -22,27 +22,29 @@ export function ListaComunidadesPage() {
 
   useEffect(() => {
     let cancelado = false;
-    setCarregando(true);
-    listarComunidades({ cidade: cidade || undefined, pagina, limite: 12 })
-      .then((resposta) => {
-        if (cancelado) return;
-        setComunidades(resposta.dados);
-        setTotalPaginas(resposta.paginacao.total_paginas);
-        setErro(null);
-      })
-      .catch((err) => {
-        if (cancelado) return;
-        setErro(err instanceof HttpError ? err.message : 'Não foi possível carregar comunidades');
-      })
-      .finally(() => !cancelado && setCarregando(false));
+    // Debounce simples pra não disparar 1 request por tecla digitada -
+    // a busca agora é feita no backend (issue #92: antes só filtrava os
+    // itens já carregados da página atual, perdia resultado fora dela).
+    const timer = setTimeout(() => {
+      setCarregando(true);
+      listarComunidades({ busca: busca || undefined, cidade: cidade || undefined, pagina, limite: 12 })
+        .then((resposta) => {
+          if (cancelado) return;
+          setComunidades(resposta.dados);
+          setTotalPaginas(resposta.paginacao.total_paginas);
+          setErro(null);
+        })
+        .catch((err) => {
+          if (cancelado) return;
+          setErro(err instanceof HttpError ? err.message : 'Não foi possível carregar comunidades');
+        })
+        .finally(() => !cancelado && setCarregando(false));
+    }, 300);
     return () => {
       cancelado = true;
+      clearTimeout(timer);
     };
-  }, [cidade, pagina]);
-
-  const comunidadesFiltradas = busca
-    ? comunidades.filter((c) => c.nome.toLowerCase().includes(busca.toLowerCase()))
-    : comunidades;
+  }, [busca, cidade, pagina]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -59,7 +61,10 @@ export function ListaComunidadesPage() {
         <Input
           placeholder="Buscar por nome..."
           value={busca}
-          onChange={(e) => setBusca(e.target.value)}
+          onChange={(e) => {
+            setPagina(1);
+            setBusca(e.target.value);
+          }}
           className="max-w-xs"
         />
         <Input
@@ -76,12 +81,12 @@ export function ListaComunidadesPage() {
       {erro && <p className="text-sm text-destructive">{erro}</p>}
       {carregando && <p className="text-muted-foreground">Carregando...</p>}
 
-      {!carregando && comunidadesFiltradas.length === 0 && !erro && (
+      {!carregando && comunidades.length === 0 && !erro && (
         <p className="text-muted-foreground">Nenhuma comunidade encontrada.</p>
       )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {comunidadesFiltradas.map((comunidade) => (
+        {comunidades.map((comunidade) => (
           <Link key={comunidade.id} to={`/comunidades/${comunidade.id}`}>
             <Card className="h-full transition-colors hover:border-primary">
               <CardHeader>

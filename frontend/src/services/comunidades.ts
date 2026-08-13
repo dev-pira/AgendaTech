@@ -9,7 +9,12 @@ import type {
   PapelMembro,
 } from '@/types/api';
 
-export function listarComunidades(params: { cidade?: string; pagina?: number; limite?: number }) {
+export function listarComunidades(params: {
+  busca?: string;
+  cidade?: string;
+  pagina?: number;
+  limite?: number;
+}) {
   if (MOCK_ENABLED) return mock.listarComunidades(params);
   return request<ListaResponse<Comunidade>>('/comunidades', {
     query: params as QueryParams,

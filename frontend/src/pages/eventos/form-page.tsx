@@ -55,7 +55,11 @@ export function FormEventoPage() {
             local: evento.local,
             tipo: evento.tipo,
             url_online: evento.url_online ?? '',
-            comunidade_id: evento.comunidade_id,
+            // evento.comunidade_id nao existe na resposta real da API
+            // (so mocks/db.ts, uso interno) - sempre undefined em
+            // producao, o form de edicao ficava sem comunidade
+            // selecionada por baixo. Ver issue #92.
+            comunidade_id: evento.comunidade.id,
           });
         } else if (comunidadesResposta.dados[0]) {
           setForm((atual) => ({ ...atual, comunidade_id: comunidadesResposta.dados[0].id }));
