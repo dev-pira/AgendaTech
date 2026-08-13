@@ -1,10 +1,13 @@
 import * as mock from '@/mocks/auth.mock';
 import { MOCK_ENABLED, request } from '@/services/http';
-import type { AuthResponse } from '@/types/api';
+import type { AuthResponse, CadastroInput } from '@/types/api';
 
-export function registrar(dados: { nome: string; email: string; senha: string }) {
+export function registrar(dados: CadastroInput) {
   if (MOCK_ENABLED) return mock.registrar(dados);
-  return request<AuthResponse>('/auth/registro', { method: 'POST', body: dados, auth: false });
+  // POST /api/cadastro (App\Http\Controllers\Api\AuthController::cadastro)
+  // - antes o front chamava /auth/registro, que nunca existiu no Laravel
+  // (contrato da versao Node antiga). Ver issue #73.
+  return request<AuthResponse>('/cadastro', { method: 'POST', body: dados, auth: false });
 }
 
 export function login(dados: { username: string; password: string }) {

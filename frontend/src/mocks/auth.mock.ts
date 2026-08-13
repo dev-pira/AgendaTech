@@ -1,5 +1,5 @@
 import { getToken, HttpError } from '@/services/http';
-import type { AuthResponse } from '@/types/api';
+import type { AuthResponse, CadastroInput } from '@/types/api';
 
 import { uuid, usuarios } from './db';
 import { delay } from './utils';
@@ -8,20 +8,19 @@ function sanitizar(usuario: (typeof usuarios)[number]): AuthResponse['usuario'] 
   return { id: usuario.id, nome: usuario.nome, email: usuario.email };
 }
 
-export async function registrar(dados: {
-  nome: string;
-  email: string;
-  senha: string;
-}): Promise<AuthResponse> {
+export async function registrar(dados: CadastroInput): Promise<AuthResponse> {
   await delay();
+  if (dados.password !== dados.password_confirmation) {
+    throw new HttpError(422, 'As senhas não coincidem [mock]');
+  }
   if (usuarios.some((u) => u.email.toLowerCase() === dados.email.toLowerCase())) {
     throw new HttpError(409, 'Já existe um usuário cadastrado com esse email [mock]');
   }
   const usuario = {
     id: uuid(),
-    nome: dados.nome,
+    nome: `${dados.first_name} ${dados.last_name ?? ''}`.trim(),
     email: dados.email,
-    senha: dados.senha,
+    senha: dados.password,
     criado_em: new Date().toISOString(),
   };
   usuarios.push(usuario);
