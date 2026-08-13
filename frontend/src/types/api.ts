@@ -101,13 +101,20 @@ export interface CalendarioResponse {
 }
 
 export interface AuthResponse {
-  usuario: UsuarioResumo & { criado_em: string };
+  // Corrigido pra bater com o retorno real de
+  // App\Http\Controllers\Api\AuthController::obterToken (ver issue #93) -
+  // o backend Laravel nao tem criado_em nessa resposta.
+  usuario: UsuarioResumo;
   token: string;
 }
 
 export interface ApiErrorBody {
-  erro: {
-    mensagem: string;
-    detalhes?: unknown;
+  // Nomes em ingles - bate com App\Support\ApiErrorResponder no Laravel,
+  // nao com o "erro/mensagem" em portugues do contrato antigo (Node). Ver
+  // issue #93.
+  error: {
+    code: string;
+    message: string;
+    details?: unknown;
   };
 }

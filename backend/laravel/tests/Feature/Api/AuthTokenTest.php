@@ -27,6 +27,29 @@ class AuthTokenTest extends TestCase
         $response->assertOk()->assertJsonStructure(['token']);
     }
 
+    public function test_resposta_inclui_dados_basicos_do_usuario(): void
+    {
+        // O frontend nao tem outro jeito de saber quem logou (JWT so
+        // carrega o id) - ver issue #93. A resposta do login precisa
+        // trazer usuario junto com o token.
+        $this->makeUser([
+            'username' => 'joao',
+            'password' => bcrypt('StrongPass123!'),
+            'first_name' => 'João',
+            'last_name' => 'Silva',
+            'email' => 'joao@example.com',
+        ]);
+
+        $response = $this->postJson('/api/auth/token', [
+            'username' => 'joao',
+            'password' => 'StrongPass123!',
+        ]);
+
+        $response->assertOk()->assertJsonStructure(['token', 'usuario' => ['id', 'nome', 'email']]);
+        $this->assertEquals('João Silva', $response->json('usuario.nome'));
+        $this->assertEquals('joao@example.com', $response->json('usuario.email'));
+    }
+
     public function test_token_retornado_e_valido_para_o_usuario_correto(): void
     {
         $user = $this->makeUser(['username' => 'joao', 'password' => bcrypt('StrongPass123!')]);
