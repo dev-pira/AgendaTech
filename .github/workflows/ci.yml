@@ -82,12 +82,8 @@ jobs:
       - name: Lint (ESLint)
         run: npm run lint
 
-      # format:check NÃO entra aqui de propósito por ora: o restante do
-      # código (~60 arquivos pré-existentes) tem drift de formatação nunca
-      # verificado por CI antes - rodar isso bloqueando agora quebraria o
-      # CI pra qualquer PR até alguém rodar `npm run format` no repo
-      # inteiro. Ver issue #32 (a config do Prettier em si já está feita
-      # e correta - isso aqui é só sobre ligar a checagem automática).
+      - name: Formatação (Prettier)
+        run: npm run format:check
 
       - name: Testes unitários (Vitest, com cobertura)
         run: npm run test:coverage

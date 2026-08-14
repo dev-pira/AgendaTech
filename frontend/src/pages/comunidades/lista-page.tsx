@@ -27,7 +27,12 @@ export function ListaComunidadesPage() {
     // itens já carregados da página atual, perdia resultado fora dela).
     const timer = setTimeout(() => {
       setCarregando(true);
-      listarComunidades({ busca: busca || undefined, cidade: cidade || undefined, pagina, limite: 12 })
+      listarComunidades({
+        busca: busca || undefined,
+        cidade: cidade || undefined,
+        pagina,
+        limite: 12,
+      })
         .then((resposta) => {
           if (cancelado) return;
           setComunidades(resposta.dados);
