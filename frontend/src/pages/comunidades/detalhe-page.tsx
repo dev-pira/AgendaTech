@@ -75,7 +75,8 @@ export function DetalheComunidadePage() {
   // Achado comparando com a tela Blade (comunidades.show, $podeGerenciar)
   // no regressivo #92.
   const souOrganizador =
-    !!usuario && !!comunidade.membros?.some((m) => m.usuario_id === usuario.id && m.papel === 'organizador');
+    !!usuario &&
+    !!comunidade.membros?.some((m) => m.usuario_id === usuario.id && m.papel === 'organizador');
 
   return (
     <div className="flex flex-col gap-6">

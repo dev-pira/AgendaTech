@@ -31,10 +31,16 @@ export default defineConfig(({ command }) => ({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
-      // Meta do WBS é 70% - ainda não estamos lá (cobertura concentrada em
-      // lib/services por enquanto, não em componentes de página). Sem
-      // "thresholds" travando o CI por ora - ver #30, o objetivo aqui é
-      // medir e reportar, o gate de branch protection fica pra depois.
+      // all:true inclui no relatório todo arquivo em src/, não só os que
+      // algum teste importa - sem isso o "% de cobertura" reportada media
+      // só os poucos arquivos já testados (ficava ~95%) e escondia que a
+      // cobertura real do projeto inteiro é ~16%. Ver issue #30: a meta do
+      // WBS é 70%, ainda longe daqui - por isso não há "thresholds"
+      // travando o CI ainda (quebraria todo PR). Faltam testes de
+      // componentes de página (comunidades, eventos, calendário,
+      // membros) pra fechar essa distância.
+      all: true,
+      include: ['src/**/*.{ts,tsx}'],
       exclude: [
         'src/main.tsx',
         'src/vite-env.d.ts',

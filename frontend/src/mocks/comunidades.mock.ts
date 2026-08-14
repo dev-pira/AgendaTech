@@ -21,7 +21,8 @@ function contarMembros(comunidadeId: string) {
 // #92: antes o mock (e o front) so checavam o criador original.
 function ehOrganizador(comunidadeId: string, usuarioId: string) {
   return membros.some(
-    (m) => m.comunidade_id === comunidadeId && m.usuario_id === usuarioId && m.papel === 'organizador',
+    (m) =>
+      m.comunidade_id === comunidadeId && m.usuario_id === usuarioId && m.papel === 'organizador',
   );
 }
 

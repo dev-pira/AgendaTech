@@ -6,7 +6,11 @@ import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  // coverage/ (relatório do vitest --coverage) não é ignorado pelo .gitignore
+  // sozinho pro ESLint - sem isso, `npm run lint` varria o lcov-report
+  // gerado (arquivos de terceiros minificados) e sujava a saída com warnings
+  // que não são nossos. Ver issue #32.
+  { ignores: ['dist', 'coverage'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended, prettier],
     files: ['**/*.{ts,tsx}'],

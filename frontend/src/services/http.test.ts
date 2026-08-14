@@ -30,13 +30,21 @@ describe('getUsuario / setUsuario', () => {
 
   it('persiste e recupera o usuário como objeto (round-trip via JSON)', () => {
     // id é uuid (string), não numérico - users.id é uuid() na migration.
-    const usuario = { id: '9d1c1e2a-1111-4b1a-9c1a-000000000001', nome: 'Fabio Baldin', email: 'fabio@example.com' };
+    const usuario = {
+      id: '9d1c1e2a-1111-4b1a-9c1a-000000000001',
+      nome: 'Fabio Baldin',
+      email: 'fabio@example.com',
+    };
     setUsuario(usuario);
     expect(getUsuario()).toEqual(usuario);
   });
 
   it('remove o usuário do storage quando setUsuario(null)', () => {
-    setUsuario({ id: '9d1c1e2a-1111-4b1a-9c1a-000000000001', nome: 'Fabio Baldin', email: 'fabio@example.com' });
+    setUsuario({
+      id: '9d1c1e2a-1111-4b1a-9c1a-000000000001',
+      nome: 'Fabio Baldin',
+      email: 'fabio@example.com',
+    });
     setUsuario(null);
     expect(getUsuario()).toBeNull();
   });
@@ -104,7 +112,11 @@ describe('request', () => {
     vi.mocked(fetch).mockResolvedValueOnce(
       new Response(
         JSON.stringify({
-          error: { code: 'VALIDATION_ERROR', message: 'Credenciais inválidas.', details: { campo: 'senha' } },
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Credenciais inválidas.',
+            details: { campo: 'senha' },
+          },
         }),
         { status: 401, headers: { 'content-type': 'application/json' } },
       ),
@@ -137,7 +149,9 @@ describe('request', () => {
       }),
     );
 
-    await request('/comunidades', { query: { cidade: 'Limeira', pagina: 2, busca: '', tag: undefined } });
+    await request('/comunidades', {
+      query: { cidade: 'Limeira', pagina: 2, busca: '', tag: undefined },
+    });
 
     const [url] = vi.mocked(fetch).mock.calls[0];
     expect(url).toBe('/api/comunidades?cidade=Limeira&pagina=2');
