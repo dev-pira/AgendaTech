@@ -28,17 +28,21 @@ export default defineConfig(({ command }) => ({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
+    // Default de 5s estoura em máquinas mais lentas/CI sob carga em testes
+    // com várias interações de formulário em sequência (userEvent.type em
+    // vários campos) - visto isolado passando mas falhando por timeout só
+    // quando a suíte inteira roda em paralelo.
+    testTimeout: 10000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
       // all:true inclui no relatório todo arquivo em src/, não só os que
       // algum teste importa - sem isso o "% de cobertura" reportada media
       // só os poucos arquivos já testados (ficava ~95%) e escondia que a
-      // cobertura real do projeto inteiro é ~16%. Ver issue #30: a meta do
-      // WBS é 70%, ainda longe daqui - por isso não há "thresholds"
-      // travando o CI ainda (quebraria todo PR). Faltam testes de
-      // componentes de página (comunidades, eventos, calendário,
-      // membros) pra fechar essa distância.
+      // cobertura real do projeto inteiro era só ~16%. Ver issue #30: meta
+      // do WBS é 70% - agora com os testes de página (comunidades, eventos,
+      // calendário, membros) batemos ~87% real, então o threshold trava o
+      // CI de verdade se a cobertura cair.
       all: true,
       include: ['src/**/*.{ts,tsx}'],
       exclude: [
@@ -47,7 +51,19 @@ export default defineConfig(({ command }) => ({
         'src/mocks/**',
         'src/components/ui/**',
         'src/test/**',
+        // App.tsx e router.tsx são só composição/config (providers,
+        // definição de rotas) - cobertos indiretamente pelos testes de
+        // página; testar diretamente exigiria montar o app inteiro com
+        // createBrowserRouter/histórico real pra um retorno baixo.
+        'src/App.tsx',
+        'src/routes/router.tsx',
       ],
+      thresholds: {
+        statements: 70,
+        branches: 70,
+        functions: 70,
+        lines: 70,
+      },
     },
   },
 }));
