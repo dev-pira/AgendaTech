@@ -16,7 +16,7 @@ class AuthController extends Controller
 {
     public function home()
     {
-        return redirect()->route('comunidades.index');
+        return redirect('/app');
     }
 
     public function mostrarCadastro()
