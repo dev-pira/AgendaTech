@@ -60,6 +60,11 @@ AgendaTech/
 │   ├── escopo-funcional.md   # Especificação funcional do produto
 │   ├── tracking-plan.md      # Plano de tracking e apresentação
 │   └── wireframes/           # Wireframes de baixa fidelidade
+├── evento/                   # Registros do evento Communities WKND Boituva
+│   ├── Fotos/                # 101 fotos do evento
+│   ├── Videos/               # 5 vídeos do evento
+│   ├── Apresentações/        # Apresentações das comunidades
+│   └── README.md             # Documentação do evento
 ├── backend/                  # Código do backend (DevLimeira)
 ├── frontend/                 # Código do frontend (DevItape)
 ├── infra/                    # Configurações de infraestrutura (DevRioClaro)
@@ -149,6 +154,7 @@ Este projeto está licenciado sob a [Licença MIT](./LICENSE).
 - [Work Breakdown Structure](./docs/wbs.md)
 - [Escopo Funcional](./docs/escopo-funcional.md)
 - [Plano de Tracking](./docs/tracking-plan.md)
+- [Registros do Evento](./evento/README.md)
 - [GitHub Projects Board](https://github.com/orgs/AgendaTech/projects/1)
 
 ---
