@@ -44,6 +44,25 @@ class MembroTest extends TestCase
         $this->assertEquals('organizador', $response->json('dados.0.papel'));
     }
 
+    public function test_listar_sem_ser_organizador_recebe_403(): void
+    {
+        // Regressão da issue #75: index() vazava e-mail dos membros pra
+        // qualquer usuário autenticado, sem checar se é organizador da
+        // comunidade — diferente de store/updatePapel/destroy, que sempre
+        // checaram. Um usuário sem nenhum vínculo com a comunidade não pode
+        // ver a lista (nem sequer um membro comum, só organizador).
+        $organizador = $this->makeUser();
+        $comunidade = $this->makeComunidade($organizador);
+        $usuarioSemVinculo = $this->makeUser();
+
+        $response = $this->getJson(
+            "/api/comunidades/{$comunidade->id}/membros",
+            $this->authHeader($usuarioSemVinculo)
+        );
+
+        $response->assertStatus(403);
+    }
+
     public function test_listar_sem_autenticacao_retorna_401(): void
     {
         $organizador = $this->makeUser();

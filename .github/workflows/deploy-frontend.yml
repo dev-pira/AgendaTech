@@ -1,0 +1,59 @@
+name: Deploy Frontend
+
+# Builda o frontend React (Vite) e sobe o resultado pro king.host via FTP,
+# na subpasta /app/ da mesma webroot do backend - ver issues #85/#86.
+#
+# FTP funciona daqui (GitHub Actions) porque o acesso Global foi liberado
+# no Kingpainel (antes só aceitava conexao de dentro do Brasil). SSH
+# direto continua bloqueado independente disso - ver docs/deploy.md.
+# Reusa os mesmos secrets SSH_HOST/SSH_USER/SSH_PASSWORD (mesma conta,
+# FTP e SSH compartilham login no king.host).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch: {}
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Build (base /app/, ver vite.config.ts)
+        run: npm run build
+        # VITE_API_URL não é setada de propósito - fica no padrão relativo
+        # (/api), same-origin com o backend, sem precisar de CORS.
+
+      - name: Subir build via FTP pra /app/
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          # "defaults.run.working-directory: frontend" (acima) só vale pra
+          # steps "run:", não pra steps "uses:" como este - por isso o
+          # caminho aqui precisa do prefixo frontend/ explicito.
+          local-dir: ./frontend/dist/
+          # O login FTP do king.host ja cai dentro de ~/www/ (confirmado
+          # empiricamente - ver docs/deploy.md), entao NAO repete "www/"
+          # aqui, senao cria ~/www/www/agendatech/app/ por engano.
+          server-dir: ./agendatech/app/
+          dangerous-clean-slate: true

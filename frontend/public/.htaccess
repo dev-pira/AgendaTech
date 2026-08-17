@@ -1,0 +1,45 @@
+# Fallback de rotas do SPA (React Router) quando publicado em /app/ na
+# webroot do king.host — ver issue #85. Sem isso, dar F5 ou acessar
+# diretamente uma rota tipo /app/comunidades/123 retorna 404 do Apache,
+# porque esse caminho não existe como arquivo físico: só o index.html sabe
+# rotear pra ele no lado do cliente.
+#
+# Este arquivo é copiado automaticamente pro dist/ pelo Vite (tudo que está
+# em frontend/public/ vai pra raiz do build) — não precisa ser recriado
+# manualmente no servidor a cada deploy.
+
+# Resolve /app/ (sem nome de arquivo) direto pro index.html via mod_dir,
+# antes do mod_rewrite entrar em ação — sem isso, a combinação de
+# RewriteCond -d + requisição de diretório causava loop de redirecionamento
+# ("redirecionou-o demasiadas vezes") especificamente na URL "pelada" /app/.
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /app/
+
+    # Deixa passar arquivos que realmente existem (JS, CSS, imagens, etc.)
+    # sem reescrever. Não checa diretórios aqui (ver comentário acima).
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # Todo o resto cai no index.html — o React Router decide o que
+    # renderizar a partir da URL.
+    RewriteRule ^ index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    # index.html precisa ser sempre revalidado - é ele que aponta pros
+    # nomes com hash dos assets, então nunca pode ficar preso em cache
+    # velho no navegador (senão o deploy novo não aparece pro usuário).
+    <FilesMatch "^index\.html$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+
+    # JS/CSS/imagens saem do build com hash no nome (ex.: index-CY6PWMXZ.js)
+    # - o conteúdo de um nome de arquivo nunca muda, então cache máximo é
+    # seguro e não precisa de limpeza manual a cada deploy.
+    <FilesMatch "\.(js|css|svg|png|jpg|jpeg|gif|woff2?)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+</IfModule>

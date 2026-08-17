@@ -16,7 +16,8 @@ Route::get('/cadastro', [AuthController::class, 'mostrarCadastro'])->name('cadas
 Route::post('/cadastro', [AuthController::class, 'cadastro'])->name('cadastro.store');
 
 Route::get('/login', [AuthController::class, 'mostrarLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.store');
+// Issue #76: sem throttle, dava pra tentar senha infinitas vezes.
+Route::post('/login', [AuthController::class, 'login'])->name('login.store')->middleware('throttle:5,1');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/comunidades', [ComunidadeController::class, 'index'])->name('comunidades.index');
