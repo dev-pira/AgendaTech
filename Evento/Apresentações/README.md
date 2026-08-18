@@ -11,6 +11,13 @@ As apresentações seguiram a seguinte ordem:
 3. **DevRioClaro** - Comunidade de Rio Claro
 4. **DevItape** - Comunidade de Itapetininga
 
+## 📁 Apresentações Disponíveis
+
+### 3. DevRioClaro
+🔗 **[Apresentação DevRioClaro](https://github.com/orlandosaraivajr/WEB_Communities_WKND)**
+
+---
+
 ## 📁 Organização
 
 Os arquivos das apresentações devem ser organizados nesta pasta, preferencialmente identificados por comunidade.
@@ -18,7 +25,7 @@ Os arquivos das apresentações devem ser organizados nesta pasta, preferencialm
 Exemplo de nomenclatura sugerida:
 - `01_DEVPIRA_apresentacao.pdf`
 - `02_DevLimeira_apresentacao.pdf`
-- `03_DevRioClaro_apresentacao.pdf`
+- `03_DevRioClaro_apresentacao.pdf` (disponível no link acima)
 - `04_DevItape_apresentacao.pdf`
 
 ## 📝 Observações
